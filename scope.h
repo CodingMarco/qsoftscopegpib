@@ -31,6 +31,8 @@ private:
 	WAVEFORM_FORMAT format;
 	ACQUIRE_TYPE acquireType;
 
+	bool printCommands = true;
+
 	bool digitize();
 
 signals:

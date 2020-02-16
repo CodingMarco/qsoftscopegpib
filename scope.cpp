@@ -17,20 +17,20 @@ Scope::Scope(int addr, QObject *parent) : QObject(parent)
 	// Connect to scope at specified address
 	// /dev/gpib0, addr. 7, no second addr, 10s timeout, no EOI line, stop at EOS-Byte
 	int eosmode = int('\n');
-	this->device = ibdev(0, addr, 0, T3s, 1, eosmode);
+	this->device = ibdev(0, addr, 0, T3s, 0, 0);
 	if(this->device == -1)
 	{
-		qCritical() << "Could not connect to scope (actually GPIB-adapter)";
+		qCritical() << "Could not connect to GPIB-adapter";
 		exit(EXIT_FAILURE);
 	}
 	writeCmd("*IDN?");
 	qDebug() << "IDN: " << readString();
 	// Default values
+	writeCmd(":SYSTEM:HEADER OFF");
+	this->setAcquireType(ACQUIRE_TYPE_NORMAL);
 	this->setPoints(POINTS_512);
 	this->setFormat(WAVEFORM_FORMAT_WORD);
 	this->setSourceChannel(1);
-	this->setAcquireType(ACQUIRE_TYPE_NORMAL);
-
 
 //	QElapsedTimer t;
 //	t.start();
@@ -50,15 +50,17 @@ Scope::Scope(int addr, QObject *parent) : QObject(parent)
 QVector<short> Scope::getWaveformData()
 {
 	digitize();
-	short buffer[this->points*this->bytesPerPoint + 10];
-	for(int i = 0; i < sizeof(buffer)/2; i++)
+	writeCmd(":WAVEFORM:DATA?");
+	sleep(1);
+	short buffer[this->points];
+	for(int i = 0; i < this->points; i++)
 	{
 		buffer[i] = 0xAA;
 	}
-	ibrd(device, buffer, sizeof(buffer)/2);
+	ibrd(device, buffer, this->points*this->bytesPerPoint);
 	QVector<short> ret;
-	ret.reserve(this->points*this->bytesPerPoint);
-	for(int i = 5; i < sizeof(buffer); i++)
+	ret.reserve(this->points);
+	for(int i = 0; i < this->points; i++)
 		ret.append(buffer[i]);
 	return ret;
 }
@@ -67,6 +69,8 @@ int Scope::writeCmd(QString cmd)
 {
 	if(!cmd.endsWith('\n'))
 		cmd.append('\n');
+	if(printCommands)
+		qDebug() << "CMD:" << cmd;
 	int ret = ibwrt(device, cmd.toStdString().c_str(), cmd.length());
 	return ret;
 }
@@ -75,7 +79,7 @@ int Scope::writeCmd(QString cmd, int param)
 {
 	cmd.append(QString::number(param));
 	cmd.append('\n');
-	int ret = ibwrt(device, cmd.toStdString().c_str(), cmd.length());
+	int ret = writeCmd(cmd);
 	return ret;
 }
 
