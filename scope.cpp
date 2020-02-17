@@ -6,6 +6,7 @@
 #include <QElapsedTimer>
 #include <QThread>
 #include <unistd.h>
+#include <QtEndian>
 
 volatile int ibsta;
 volatile int iberr;
@@ -47,21 +48,24 @@ Scope::Scope(int addr, QObject *parent) : QObject(parent)
 //	printf("\n");
 }
 
-QVector<short> Scope::getWaveformData()
+QVector<ushort> Scope::getWaveformData()
 {
 	digitize();
 	writeCmd(":WAVEFORM:DATA?");
-	sleep(1);
-	short buffer[this->points];
-	for(int i = 0; i < this->points; i++)
+
+	ushort buffer[this->points + 10/bytesPerPoint];
+	for(int i = 0; i < this->points + 5; i++)
 	{
-		buffer[i] = 0xAA;
+		buffer[i] = 0x0;
 	}
-	ibrd(device, buffer, this->points*this->bytesPerPoint);
-	QVector<short> ret;
+	ibrd(device, buffer, this->points*this->bytesPerPoint+(10/bytesPerPoint));
+	QVector<ushort> ret;
 	ret.reserve(this->points);
-	for(int i = 0; i < this->points; i++)
-		ret.append(buffer[i]);
+	for(int i = 10/bytesPerPoint; i < this->points+10/bytesPerPoint; i++)
+		ret.append(qToBigEndian(buffer[i]));
+
+	ret[ret.length()-1] = ret[ret.length()-3];
+	ret[ret.length()-2] = ret[ret.length()-3];
 	return ret;
 }
 
@@ -147,4 +151,10 @@ QString Scope::readString()
 	ibrd(device, buffer, sizeof(buffer));
 	QString ret = QString::fromLocal8Bit(buffer).split('\n')[0];
 	return ret;
+}
+
+QString Scope::query(QString cmd)
+{
+	this->writeCmd(cmd);
+	return this->readString();
 }

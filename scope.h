@@ -15,13 +15,17 @@ public:
 
 	// Get data
 	QString readString();
-	QVector<short> getWaveformData();
+	QString query(QString cmd);
+	QVector<ushort> getWaveformData();
 
 	// Set parameters
 	bool setPoints(POINTS m_points);
 	bool setFormat(WAVEFORM_FORMAT m_format);
 	bool setSourceChannel(int m_channel);
 	bool setAcquireType(ACQUIRE_TYPE m_type);
+
+	// Get parameters
+	POINTS getPoints() { return this->points; }
 
 private:
 	int device = -1;

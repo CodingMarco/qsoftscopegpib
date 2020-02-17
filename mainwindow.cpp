@@ -3,7 +3,12 @@
 #include "scope.h"
 #include "scopeNamespace.h"
 #include <QDebug>
+#include <QVector>
+#include <QTimer>
 #include <unistd.h>
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_scale_engine.h>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
@@ -11,21 +16,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui->setupUi(this);
 	scope = new Scope(7);
-//	scope->setPoints(POINTS_512);
-//	scope->setFormat(WAVEFORM_FORMAT_WORD);
-//	scope->setAcquireType(ACQUIRE_TYPE_NORMAL);
+	wftimer = new QTimer(this);
 
-	scope->writeCmd(":autoscale");
-	QVector<short> data = scope->getWaveformData();
-	qDebug() << "First data: " << data[0];
+	connect(wftimer, SIGNAL(timeout()), this, SLOT(plotWaveform()));
 
-	//	for(int i = 0; i < 200; i++)
-	//	{
-	//		scope->writeCmd(":RUN");
-	//		usleep(10e3);
-	//		scope->writeCmd(":STOP");
-	//		usleep(10e3);
-	//	}
+	waveformCurve = new QwtPlotCurve("Waveform");
+	waveformCurve->attach(ui->qwtPlot);
+	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating,true);
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, 0, 32000);
+
+	scope->setPoints(POINTS_32768);
+	scope->writeCmd(":TIMEBASE:SAMPLE:CLOCK 5E6");
 }
 
 MainWindow::~MainWindow()
@@ -34,3 +35,25 @@ MainWindow::~MainWindow()
 	delete scope;
 }
 
+void MainWindow::plotWaveform()
+{
+	QVector<ushort> yshort = scope->getWaveformData();
+	QVector<double> x;
+	QVector<double> y;
+	x.reserve(scope->getPoints());
+	y.reserve(scope->getPoints());
+	for(int i = 0; i < scope->getPoints(); i++)
+	{
+		x.append(i);
+		y.append(yshort[i]);
+	}
+	waveformCurve->setSamples(x, y);
+
+	ui->qwtPlot->replot();
+}
+
+
+void MainWindow::on_cmdRefresh_clicked()
+{
+	wftimer->start(1);
+}
