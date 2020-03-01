@@ -7,6 +7,7 @@
 #include <QThread>
 #include <unistd.h>
 #include <QtEndian>
+#include <QMessageBox>
 
 volatile int ibsta;
 volatile int iberr;
@@ -18,13 +19,18 @@ Scope::Scope(int addr, QObject *parent) : QObject(parent)
 	// Connect to scope at specified address
 	// /dev/gpib0, addr. 7, no second addr, 10s timeout, no EOI line, stop at EOS-Byte
 	int eosmode = int('\n');
-	this->device = ibdev(0, addr, 0, T3s, 0, 0);
-	if(this->device == -1)
+	this->_device = ibdev(0, addr, 0, T3s, 0, 0);
+	if(this->_device == -1)
 	{
 		qCritical() << "Could not connect to GPIB-adapter";
 		exit(EXIT_FAILURE);
 	}
 	writeCmd("*IDN?");
+	if(iberr == EBUS)
+	{
+		QMessageBox::critical(nullptr, "Connection timed out!", "Connection timed out!");
+		exit(EXIT_FAILURE);
+	}
 	qDebug() << "IDN: " << readString();
 	// Default values
 	writeCmd(":SYSTEM:HEADER OFF");
@@ -32,20 +38,12 @@ Scope::Scope(int addr, QObject *parent) : QObject(parent)
 	this->setPoints(POINTS_512);
 	this->setFormat(WAVEFORM_FORMAT_WORD);
 	this->setSourceChannel(1);
+	this->updateTimebaseRange();
 
 //	QElapsedTimer t;
 //	t.start();
-//	//qDebug() << "Bytes: " << ibcnt;
-//	for(int i = 0; i < 30; i++)
-//	{
-//		t.restart();
-//		writeCmd(":WAVEFORM:DATA?");
-//		QString str = readString();
-//		printf("\r%Lims, %d", t.elapsed(), ibcnt);
-//		printf("Last: %s", str.remove(50, str.size()-50).toStdString().c_str());
-//		fflush(stdout);
-//	}
-//	printf("\n");
+//	printf("\r%Lims, %d", t.elapsed(), ibcnt);
+
 }
 
 QVector<ushort> Scope::getWaveformData()
@@ -53,15 +51,15 @@ QVector<ushort> Scope::getWaveformData()
 	digitize();
 	writeCmd(":WAVEFORM:DATA?");
 
-	ushort buffer[this->points + 10/bytesPerPoint];
-	for(int i = 0; i < this->points + 5; i++)
+	ushort buffer[this->_points + 10/_bytesPerPoint];
+	for(int i = 0; i < this->_points + 5; i++)
 	{
 		buffer[i] = 0x0;
 	}
-	ibrd(device, buffer, this->points*this->bytesPerPoint+(10/bytesPerPoint));
+	ibrd(_device, buffer, this->_points*this->_bytesPerPoint+(10/_bytesPerPoint));
 	QVector<ushort> ret;
-	ret.reserve(this->points);
-	for(int i = 10/bytesPerPoint; i < this->points+10/bytesPerPoint; i++)
+	ret.reserve(this->_points);
+	for(int i = 10/_bytesPerPoint; i < this->_points+10/_bytesPerPoint; i++)
 		ret.append(qToBigEndian(buffer[i]));
 
 	ret[ret.length()-1] = ret[ret.length()-3];
@@ -73,9 +71,9 @@ int Scope::writeCmd(QString cmd)
 {
 	if(!cmd.endsWith('\n'))
 		cmd.append('\n');
-	if(printCommands)
+	if(_printCommands)
 		qDebug() << "CMD:" << cmd;
-	int ret = ibwrt(device, cmd.toStdString().c_str(), cmd.length());
+	int ret = ibwrt(_device, cmd.toStdString().c_str(), cmd.length());
 	return ret;
 }
 
@@ -89,22 +87,22 @@ int Scope::writeCmd(QString cmd, int param)
 
 bool Scope::setPoints(POINTS m_points)
 {
-	this->points = m_points;
+	this->_points = m_points;
 	writeCmd(QString(":ACQUIRE:POINTS "), m_points);
 	return true;
 }
 
 bool Scope::setFormat(WAVEFORM_FORMAT m_format)
 {
-	this->format = m_format;
-	switch (this->format) {
+	this->_format = m_format;
+	switch (this->_format) {
 		case WAVEFORM_FORMAT_BYTE:
 			writeCmd(":WAVEFORM:FORMAT BYTE");
-			this->bytesPerPoint = 1;
+			this->_bytesPerPoint = 1;
 			break;
 		case WAVEFORM_FORMAT_WORD:
 			writeCmd(":WAVEFORM:FORMAT WORD");
-			this->bytesPerPoint = 2;
+			this->_bytesPerPoint = 2;
 			break;
 	}
 	return true;
@@ -119,16 +117,16 @@ bool Scope::setSourceChannel(int m_channel)
 	}
 	else
 	{
-		this->sourceChannel = m_channel;
-		writeCmd(QString(":WAVEFORM:SOURCE CHANNEL"), this->sourceChannel);
+		this->_sourceChannel = m_channel;
+		writeCmd(QString(":WAVEFORM:SOURCE CHANNEL"), this->_sourceChannel);
 		return true;
 	}
 }
 
 bool Scope::setAcquireType(ACQUIRE_TYPE m_type)
 {
-	this->acquireType = m_type;
-	switch (this->acquireType) {
+	this->_acquireType = m_type;
+	switch (this->_acquireType) {
 		case ACQUIRE_TYPE_RAW:
 			writeCmd(":ACQUIRE:TYPE RAW");
 			break;
@@ -139,16 +137,29 @@ bool Scope::setAcquireType(ACQUIRE_TYPE m_type)
 	return true;
 }
 
+void Scope::autoscale()
+{
+	this->writeCmd(":autoscale");
+	updateTimebaseRange();
+}
+
+double Scope::updateTimebaseRange()
+{
+	this->_timebaseRange = this->query("TIMEBASE:RANGE?").toDouble();
+	emit timebaseRangeUpdated(this->_timebaseRange);
+	return this->_timebaseRange;
+}
+
 bool Scope::digitize()
 {
-	writeCmd(QString(":DIGITIZE CHANNEL"), this->sourceChannel);
+	writeCmd(QString(":DIGITIZE CHANNEL"), this->_sourceChannel);
 	return true;
 }
 
 QString Scope::readString()
 {
 	char buffer[1000];
-	ibrd(device, buffer, sizeof(buffer));
+	ibrd(_device, buffer, sizeof(buffer));
 	QString ret = QString::fromLocal8Bit(buffer).split('\n')[0];
 	return ret;
 }

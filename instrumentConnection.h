@@ -1,16 +1,12 @@
-#ifndef INSTRUMENTCONNECTION_H
-#define INSTRUMENTCONNECTION_H
-
+#pragma once
 #include <QObject>
 
-class instrumentConnection : public QObject
+class InstrumentConnection : public QObject
 {
 	Q_OBJECT
 public:
-	explicit instrumentConnection(QObject *parent = nullptr);
+	explicit InstrumentConnection(QObject *parent = nullptr);
 
 signals:
 
 };
-
-#endif // INSTRUMENTCONNECTION_H

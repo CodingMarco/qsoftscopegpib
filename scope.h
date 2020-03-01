@@ -25,20 +25,32 @@ public:
 	bool setAcquireType(ACQUIRE_TYPE m_type);
 
 	// Get parameters
-	POINTS getPoints() { return this->points; }
+	POINTS points() { return this->_points; }
+	double timebaseRange() { return this->_timebaseRange; }
+
+	// Misc
+	void autoscale();
 
 private:
-	int device = -1;
-	int sourceChannel = -1;
-	int bytesPerPoint = -1;
-	POINTS points;
-	WAVEFORM_FORMAT format;
-	ACQUIRE_TYPE acquireType;
+	// Scope properties
+	int _device = -1;
+	int _sourceChannel = -1;
+	int _bytesPerPoint = -1;
+	double _timebaseRange = -1;
+	QVector<double> _channelsRange;
+	POINTS _points;
+	WAVEFORM_FORMAT _format;
+	ACQUIRE_TYPE _acquireType;
 
-	bool printCommands = true;
+	// Misc
+	bool _printCommands = false;
+
+	// Read / update parameters from oscilloscope
+	double updateTimebaseRange();
 
 	bool digitize();
 
 signals:
+	void timebaseRangeUpdated(double m_timebaseRange);
 
 };
