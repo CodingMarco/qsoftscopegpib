@@ -29,15 +29,28 @@
       </item>
       <item>
        <widget class="QPushButton" name="cmdSend">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Send</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="cmdRefresh">
+       <widget class="QPushButton" name="cmdConnect">
         <property name="text">
-         <string>Refresh</string>
+         <string>Connect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cmdStart">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Start</string>
         </property>
        </widget>
       </item>

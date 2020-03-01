@@ -25,6 +25,7 @@ private:
 
 private slots:
 	void plotWaveform();
-	void on_cmdRefresh_clicked();
+	void on_cmdStart_clicked();
+	void on_cmdConnect_clicked();
 };
 #endif // MAINWINDOW_H
