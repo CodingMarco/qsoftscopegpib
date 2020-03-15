@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11 qwt
+CONFIG += c++14 qwt
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -19,18 +19,21 @@ SOURCES += \
     instrumentConnection.cpp \
     main.cpp \
     mainwindow.cpp \
-    scope.cpp
+    scope.cpp \
+    visaInstrument.cpp
 
 HEADERS += \
     instrumentConnection.h \
     mainwindow.h \
     scope.h \
-    scopeNamespace.h
+    scopeNamespace.h \
+    visaInstrument.h
 
 FORMS += \
     mainwindow.ui
 
-LIBS += -lgpib
+LIBS += -lgpib \
+        -lvisa
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
