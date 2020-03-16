@@ -87,6 +87,8 @@ bool VisaInstrument::isOpen()
 
 bool VisaInstrument::writeCmd(QString cmd)
 {
+	if(!cmd.endsWith('\n'))
+		cmd.append('\n');
 	status = viWrite(instr, (ViByte*)cmd.toStdString().c_str(), cmd.length(), &retCount);
 	if (status < VI_SUCCESS)
 	{
@@ -95,6 +97,15 @@ bool VisaInstrument::writeCmd(QString cmd)
 	}
 	else
 		return true;
+}
+
+bool VisaInstrument::writeCmd(QString cmd, int param)
+{
+	if(cmd.endsWith('\n'))
+		cmd.remove('\n');
+	cmd.append(QString::number(param));
+	cmd.append('\n');
+	return writeCmd(cmd);
 }
 
 QString VisaInstrument::readString()
@@ -113,6 +124,14 @@ QString VisaInstrument::readString()
 QString VisaInstrument::query(QString cmd)
 {
 	if(writeCmd(cmd))
+		return readString();
+	else
+		return "";
+}
+
+QString VisaInstrument::query(QString cmd, int param)
+{
+	if(writeCmd(cmd, param))
 		return readString();
 	else
 		return "";

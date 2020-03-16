@@ -9,13 +9,9 @@ class Scope : public QObject
 {
 	Q_OBJECT
 public:
-	explicit Scope(int addr, QObject *parent = nullptr);
-	int writeCmd(QString cmd);
-	int writeCmd(QString cmd, int param);
+	explicit Scope(QObject *parent = nullptr);
 
 	// Get data
-	QString readString();
-	QString query(QString cmd);
 	QVector<ushort> getWaveformData();
 
 	// Set parameters
@@ -33,7 +29,6 @@ public:
 
 private:
 	// Scope properties
-	int _device = -1;
 	int _sourceChannel = -1;
 	int _bytesPerPoint = -1;
 	double _timebaseRange = -1;

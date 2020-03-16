@@ -26,8 +26,10 @@ public:
 	bool openInstrument(QString m_visaAddress);
 	bool isOpen();
 	bool writeCmd(QString cmd);
+	bool writeCmd(QString cmd, int param);
 	QString readString();
 	QString query(QString cmd);
+	QString query(QString cmd, int param);
 
 signals:
 

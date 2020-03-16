@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include "scope.h"
@@ -28,4 +27,3 @@ private slots:
 	void on_cmdStart_clicked();
 	void on_cmdConnect_clicked();
 };
-#endif // MAINWINDOW_H
