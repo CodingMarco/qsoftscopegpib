@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <QVector>
 #include <visa.h>
 #include <visatype.h>
 
@@ -24,10 +25,13 @@ public:
 	QString getLastVisaErrorString();
 	QStringList getAvailableInstruments();
 	bool openInstrument(QString m_visaAddress);
+	void closeInstrument();
 	bool isOpen();
 	bool writeCmd(QString cmd);
 	bool writeCmd(QString cmd, int param);
 	QString readString();
+	QByteArray readData(int bytesToRead);
+	QVector<ushort> readWordData();
 	QString query(QString cmd);
 	QString query(QString cmd, int param);
 

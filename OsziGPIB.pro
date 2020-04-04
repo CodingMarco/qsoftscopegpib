@@ -16,6 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    connectdialog.cpp \
+    fraDialog.cpp \
     gpibInstrument.cpp \
     instrumentConnection.cpp \
     main.cpp \
@@ -24,6 +26,8 @@ SOURCES += \
     visaInstrument.cpp
 
 HEADERS += \
+    connectdialog.h \
+    fraDialog.h \
     gpibInstrument.h \
     instrumentConnection.h \
     mainwindow.h \
@@ -32,7 +36,8 @@ HEADERS += \
     visaInstrument.h
 
 FORMS += \
-    ConnectDialog.ui \
+    connectdialog.ui \
+    fradialog.ui \
     mainwindow.ui
 
 LIBS += -lgpib \

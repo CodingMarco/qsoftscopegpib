@@ -1,0 +1,9 @@
+:WGEN1:FUNC SIN
+:WGEN1:VOLTAGE 5
+:WGEN1:FREQ 1
+:WGEN1:OUTPUT ON
+
+------------------------------------------------
+
+:MEASURE:SOURCE CHANNEL1
+:MEASURE:VAMP?

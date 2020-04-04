@@ -30,34 +30,44 @@
       <item>
        <widget class="QPushButton" name="cmdSend">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
-         <string>Send</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="cmdConnect">
-        <property name="text">
-         <string>Connect</string>
+         <string>Query</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="cmdStart">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Start</string>
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="cmdStop">
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
-     <widget class="QwtPlot" name="qwtPlot"/>
+     <widget class="QwtPlot" name="qwtPlot">
+      <property name="canvasBackground">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -80,13 +90,31 @@
      <string>Instrument</string>
     </property>
     <addaction name="actionConnect"/>
+    <addaction name="actionInfo"/>
+   </widget>
+   <widget class="QMenu" name="menuApps">
+    <property name="title">
+     <string>Apps</string>
+    </property>
+    <addaction name="actionFequencyResponse_Analysis"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuInstrument"/>
+   <addaction name="menuApps"/>
   </widget>
   <action name="actionConnect">
    <property name="text">
     <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionInfo">
+   <property name="text">
+    <string>Info</string>
+   </property>
+  </action>
+  <action name="actionFequencyResponse_Analysis">
+   <property name="text">
+    <string>Fequency Response Analysis</string>
    </property>
   </action>
  </widget>

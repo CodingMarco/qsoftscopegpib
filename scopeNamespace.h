@@ -1,5 +1,7 @@
 #pragma once
 
+typedef unsigned char byte;
+
 enum POINTS {
 	POINTS_512 = 512,
 	POINTS_1024 = 1024,

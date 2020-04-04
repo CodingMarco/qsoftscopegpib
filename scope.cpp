@@ -9,11 +9,12 @@
 #include <QtEndian>
 #include <QMessageBox>
 
-Scope::Scope(QObject *parent) : QObject(parent)
+Scope::Scope(InstrumentConnection* m_instrumentConnection, QObject *parent)
+	: QObject(parent), instrumentConnection(m_instrumentConnection)
 {
 
 	// Default values
-//	writeCmd(":SYSTEM:HEADER OFF");
+	instrumentConnection->writeCmd(":SYSTEM:HEADER OFF");
 	this->setAcquireType(ACQUIRE_TYPE_NORMAL);
 	this->setPoints(POINTS_512);
 	this->setFormat(WAVEFORM_FORMAT_WORD);
@@ -29,28 +30,25 @@ Scope::Scope(QObject *parent) : QObject(parent)
 QVector<ushort> Scope::getWaveformData()
 {
 	digitize();
-//	writeCmd(":WAVEFORM:DATA?");
+	instrumentConnection->writeCmd(":WAVEFORM:DATA?");
 
-	ushort buffer[this->_points + 10/_bytesPerPoint];
-	for(int i = 0; i < this->_points + 5; i++)
+	QByteArray data = instrumentConnection->readData(2 * this->_points);
+
+	QVector<ushort> samples;
+	samples.reserve(this->_points);
+
+	for(int i = 0; i < this->_points; i++)
 	{
-		buffer[i] = 0x0;
+		samples.append(*(((ushort*)data.data())+i));
 	}
-//	ibrd(_device, buffer, this->_points*this->_bytesPerPoint+(10/_bytesPerPoint));
-	QVector<ushort> ret;
-	ret.reserve(this->_points);
-	for(int i = 10/_bytesPerPoint; i < this->_points+10/_bytesPerPoint; i++)
-		ret.append(qToBigEndian(buffer[i]));
-
-	ret[ret.length()-1] = ret[ret.length()-3];
-	ret[ret.length()-2] = ret[ret.length()-3];
-	return ret;
+	return samples;
 }
 
 bool Scope::setPoints(POINTS m_points)
 {
-	this->_points = m_points;
-//	writeCmd(QString(":ACQUIRE:POINTS "), m_points);
+	_points = m_points;
+	instrumentConnection->writeCmd(QString(":WAVEFORM:POINTS "), m_points);
+	instrumentConnection->writeCmd(QString(":ACQUIRE:POINTS "), m_points);
 	return true;
 }
 
@@ -59,11 +57,11 @@ bool Scope::setFormat(WAVEFORM_FORMAT m_format)
 	this->_format = m_format;
 	switch (this->_format) {
 		case WAVEFORM_FORMAT_BYTE:
-//			writeCmd(":WAVEFORM:FORMAT BYTE");
+			instrumentConnection->writeCmd(":WAVEFORM:FORMAT BYTE");
 			this->_bytesPerPoint = 1;
 			break;
 		case WAVEFORM_FORMAT_WORD:
-//			writeCmd(":WAVEFORM:FORMAT WORD");
+			instrumentConnection->writeCmd(":WAVEFORM:FORMAT WORD");
 			this->_bytesPerPoint = 2;
 			break;
 	}
@@ -80,7 +78,7 @@ bool Scope::setSourceChannel(int m_channel)
 	else
 	{
 		this->_sourceChannel = m_channel;
-//		writeCmd(QString(":WAVEFORM:SOURCE CHANNEL"), this->_sourceChannel);
+		instrumentConnection->writeCmd(QString(":WAVEFORM:SOURCE CHANNEL"), this->_sourceChannel);
 		return true;
 	}
 }
@@ -90,30 +88,53 @@ bool Scope::setAcquireType(ACQUIRE_TYPE m_type)
 	this->_acquireType = m_type;
 	switch (this->_acquireType) {
 		case ACQUIRE_TYPE_RAW:
-//			writeCmd(":ACQUIRE:TYPE RAW");
+			instrumentConnection->writeCmd(":ACQUIRE:TYPE RAW");
 			break;
 		case ACQUIRE_TYPE_NORMAL:
-//			writeCmd(":ACQUIRE:TYPE NORMAL");
+			instrumentConnection->writeCmd(":ACQUIRE:TYPE NORMAL");
 			break;
 	}
 	return true;
 }
 
+QMap<QString, double> Scope::waveformPreamble()
+{
+	QMap<QString, double> preamble;
+	QStringList params = instrumentConnection->query(":WAVEFORM:PREAMBLE?").split(',');
+	preamble["xincrement"] = params[4].toDouble();
+	preamble["xorigin"] = params[5].toDouble();
+	preamble["xreference"] = params[6].toDouble();
+	preamble["yincrement"] = params[7].toDouble();
+	preamble["yorigin"] = params[8].toDouble();
+	preamble["yreference"] = params[9].toDouble();
+	return preamble;
+}
+
 void Scope::autoscale()
 {
-//	this->writeCmd(":autoscale");
+	instrumentConnection->writeCmd(":autoscale");
 	updateTimebaseRange();
+}
+
+bool Scope::writeCmd(QString cmd)
+{
+	return instrumentConnection->writeCmd(cmd);
+}
+
+QString Scope::query(QString cmd)
+{
+	return instrumentConnection->query(cmd);
 }
 
 double Scope::updateTimebaseRange()
 {
-//	this->_timebaseRange = this->query("TIMEBASE:RANGE?").toDouble();
+	this->_timebaseRange = instrumentConnection->query("TIMEBASE:RANGE?").toDouble();
 	emit timebaseRangeUpdated(this->_timebaseRange);
 	return this->_timebaseRange;
 }
 
 bool Scope::digitize()
 {
-//	writeCmd(QString(":DIGITIZE CHANNEL"), this->_sourceChannel);
+	instrumentConnection->writeCmd(QString(":DIGITIZE CHANNEL"), this->_sourceChannel);
 	return true;
 }
