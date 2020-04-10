@@ -3,6 +3,7 @@
 #include <gpib/ib.h>
 #include <QDebug>
 #include <QMessageBox>
+#include <QtEndian>
 
 GpibInstrument::GpibInstrument(QObject *parent) : QObject(parent)
 {
@@ -24,7 +25,7 @@ bool GpibInstrument::openInstrument(int addr)
 		qCritical() << "Could not connect to GPIB-adapter";
 		exit(EXIT_FAILURE);
 	}
-	writeCmd("*IDN?");
+	QString idn = query("*IDN?");
 	if(iberr == EBUS)
 	{
 		QMessageBox::critical(nullptr, "Connection timed out!", "Connection timed out!");
@@ -33,7 +34,7 @@ bool GpibInstrument::openInstrument(int addr)
 	}
 	else
 	{
-		qDebug() << "Opened GPIB instrument with IDN: " << readString();
+		qDebug() << "Opened GPIB instrument with IDN: " << idn;
 		return true;
 	}
 
@@ -123,7 +124,7 @@ int GpibInstrument::parseBlockData()
 	return nrint;
 }
 
-QByteArray GpibInstrument::readData(int bytesToRead)
+QByteArray GpibInstrument::readBytes(int bytesToRead)
 {
 	QByteArray data;
 	data.reserve(bytesToRead);
@@ -133,8 +134,25 @@ QByteArray GpibInstrument::readData(int bytesToRead)
 	return data;
 }
 
-QByteArray GpibInstrument::readAllData()
+QByteArray GpibInstrument::readAllByteData()
 {
-	int bytesToRead = parseBlockData();
-	return readData(bytesToRead);
+	int bytesToRead = parseBlockData()+2;
+	return readBytes(bytesToRead);
+}
+
+QVector<ushort> GpibInstrument::readAllWordData()
+{
+	return bytesToWord(readAllByteData());
+}
+
+QVector<ushort> GpibInstrument::bytesToWord(QByteArray bytes)
+{
+	QVector<ushort> wordData;
+	wordData.reserve(bytes.size()/2);
+
+	for(int i = 0; i < bytes.size()/2; i++)
+	{
+		wordData.append(qToBigEndian(*(((ushort*)bytes.data())+i)));
+	}
+	return wordData;
 }

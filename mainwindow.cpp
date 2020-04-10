@@ -14,6 +14,7 @@
 #include <QVector>
 #include <QTimer>
 #include <QMessageBox>
+#include <QtConcurrent/QtConcurrentRun>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent),
@@ -55,38 +56,21 @@ bool MainWindow::autoconnect()
 {
 	scope.openInstrument(7);
 	scope.setFormat(WAVEFORM_FORMAT_WORD);
-	scope.setPoints(POINTS_1024);
+	scope.setPoints(POINTS_512);
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
 	return true;
 }
 
 void MainWindow::plotWaveform()
 {
-	QVector<ushort> yshort = scope.getWaveformData();
-	QVector<double> x;
-	QVector<double> y;
-	x.reserve(scope.points());
-	y.reserve(scope.points());
-
-	//double secondsPerSample = scope.timebaseRange()/scope.points();
-	//double voltsPerY = scope.channelRange()/32768;
-	//ui->qwtPlot->setAxisScale(QwtPlot::yLeft, 0, 0.1);
-
-	auto preamble = scope.waveformPreamble();
-
-	for(int i = 0; i < scope.points(); i++)
-	{
-		x.append((double(i)-preamble["xreference"]) * preamble["xincrement"] + preamble["xorigin"]);
-		y.append(((double(yshort[i])-preamble["yreference"]) * preamble["yincrement"]) + preamble["yorigin"]);
-	}
-	waveformCurve->setSamples(x, y);
-
+	auto waveformData = scope.digitizeAndGetPoints();
+	waveformCurve->setSamples(waveformData);
 	ui->qwtPlot->replot();
 }
 
 void MainWindow::on_cmdStart_clicked()
 {
-	wftimer->start(1);
+	wftimer->start();
 }
 
 void MainWindow::on_cmdStop_clicked()

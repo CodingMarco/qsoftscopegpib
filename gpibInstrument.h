@@ -16,6 +16,8 @@ private:
 	int instr = -1;
 	int status = -1;
 
+	QVector<ushort> bytesToWord(QByteArray bytes);
+
 public:
 	explicit GpibInstrument(QObject *parent = nullptr);
 	virtual ~GpibInstrument();
@@ -29,11 +31,12 @@ public:
 	QString query(QString cmd, int param);
 
 	int parseBlockData();
-	QByteArray readData(int bytesToRead);
-	QByteArray readAllData();
+	QByteArray readBytes(int bytesToRead);
+	QByteArray readAllByteData();
+	QVector<ushort> readAllWordData();
 
 	void printSystErr();
 
-signals:
+protected:
 
 };

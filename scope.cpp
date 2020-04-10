@@ -15,10 +15,9 @@ Scope::Scope()
 
 QVector<ushort> Scope::getWaveformData()
 {
-	digitize();
 	writeCmd(":WAVEFORM:DATA?");
 
-	QByteArray data = readAllData();
+	QByteArray data = readAllByteData();
 
 	QVector<ushort> samples;
 	samples.reserve(data.size()/2);
@@ -28,6 +27,24 @@ QVector<ushort> Scope::getWaveformData()
 		samples.append(qToBigEndian(*(((ushort*)data.data())+i)));
 	}
 	return samples;
+}
+
+QVector<QPointF> Scope::digitizeAndGetPoints()
+{
+	digitize();
+	auto preamble = getWaveformPreamble();
+	writeCmd(":WAVEFORM:DATA?");
+
+	QVector<ushort> yRawData = readAllWordData();
+	QVector<QPointF> pointData;
+	pointData.reserve(this->points());
+
+	for(int x = 0; x < this->points(); x++)
+	{
+		pointData.append({	(double(x)-preamble["xreference"]) * preamble["xincrement"] + preamble["xorigin"],
+							(double(yRawData[x])-preamble["yreference"]) * preamble["yincrement"] + preamble["yorigin"]	});
+	}
+	return pointData;
 }
 
 bool Scope::setPoints(POINTS m_points)
@@ -82,7 +99,7 @@ bool Scope::setAcquireType(ACQUIRE_TYPE m_type)
 	return true;
 }
 
-QMap<QString, double> Scope::waveformPreamble()
+QMap<QString, double> Scope::getWaveformPreamble()
 {
 	QMap<QString, double> preamble;
 	QStringList params = query(":WAVEFORM:PREAMBLE?").split(',');
@@ -98,14 +115,6 @@ QMap<QString, double> Scope::waveformPreamble()
 void Scope::autoscale()
 {
 	writeCmd(":autoscale");
-	updateTimebaseRange();
-}
-
-double Scope::updateTimebaseRange()
-{
-	this->_timebaseRange = query("TIMEBASE:RANGE?").toDouble();
-	emit timebaseRangeUpdated(this->_timebaseRange);
-	return this->_timebaseRange;
 }
 
 bool Scope::digitize()
