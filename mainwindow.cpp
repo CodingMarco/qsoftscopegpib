@@ -28,8 +28,9 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurve = new QwtPlotCurve("Waveform");
 	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
 	waveformCurve->attach(ui->qwtPlot);
-	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating,true);
-	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -4, 4, 0.5);
+	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, true);
+	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -3, 3, 0.5);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;
@@ -58,6 +59,7 @@ bool MainWindow::autoconnect()
 	scope.setFormat(WAVEFORM_FORMAT_WORD);
 	scope.setPoints(POINTS_512);
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
+	scope.writeCmd(":TIMEBASE:SAMPlE:CLOCK AUTO");
 	return true;
 }
 
@@ -103,4 +105,24 @@ void MainWindow::on_cmdQuery_clicked()
 void MainWindow::on_cmdSend_clicked()
 {
 	scope.writeCmd(ui->lineEditCommand->text());
+}
+
+void MainWindow::on_cmdAutoscale_clicked()
+{
+	scope.autoscale();
+}
+
+void MainWindow::on_comboBox_currentIndexChanged(const QString &points)
+{
+	scope.setPoints(POINTS(points.toInt()));
+}
+
+void MainWindow::on_cmdZoomIn_clicked()
+{
+	scope.zoomIn();
+}
+
+void MainWindow::on_cmdZoomOut_clicked()
+{
+	scope.zoomOut();
 }

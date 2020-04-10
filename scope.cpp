@@ -29,8 +29,24 @@ QVector<ushort> Scope::getWaveformData()
 	return samples;
 }
 
+double Scope::updateTimebaseRange()
+{
+	this->_timebaseRange = query(":TIMEBASE:RANGE?").toDouble();
+	emit timebaseRangeUpdated(this->_timebaseRange);
+	return this->_timebaseRange;
+}
+
+bool Scope::setTimebaseRange(double range)
+{
+	writeCmd(QString(":TIMEBASE:RANGE ") + QString::number(range));
+	_timebaseRange = range;
+	return true;
+}
+
 QVector<QPointF> Scope::digitizeAndGetPoints()
 {
+	if(_timebaseRange == -1)
+		updateTimebaseRange();
 	digitize();
 	auto preamble = getWaveformPreamble();
 	writeCmd(":WAVEFORM:DATA?");
@@ -51,6 +67,7 @@ bool Scope::setPoints(POINTS m_points)
 {
 	_points = m_points;
 	writeCmd(QString(":ACQUIRE:POINTS "), m_points);
+	updateTimebaseRange();
 	return true;
 }
 
@@ -74,7 +91,7 @@ bool Scope::setSourceChannel(int m_channel)
 {
 	if(m_channel > 4 || m_channel < 1)
 	{
-		qWarning() << "Channel must be 1, 2, 3 or 4! Setting it to 1.";
+		qWarning() << "Channel must be 1, 2, 3 or 4!";
 		return false;
 	}
 	else
@@ -99,6 +116,16 @@ bool Scope::setAcquireType(ACQUIRE_TYPE m_type)
 	return true;
 }
 
+bool Scope::zoomIn()
+{
+	return setTimebaseRange(_timebaseRange * 0.5);
+}
+
+bool Scope::zoomOut()
+{
+	return setTimebaseRange(_timebaseRange * 2);
+}
+
 QMap<QString, double> Scope::getWaveformPreamble()
 {
 	QMap<QString, double> preamble;
@@ -115,6 +142,7 @@ QMap<QString, double> Scope::getWaveformPreamble()
 void Scope::autoscale()
 {
 	writeCmd(":autoscale");
+	setPoints(_points);
 }
 
 bool Scope::digitize()

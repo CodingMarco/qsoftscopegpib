@@ -34,4 +34,8 @@ private slots:
 	void on_actionInfo_triggered();
 	void on_cmdQuery_clicked();
 	void on_cmdSend_clicked();
+	void on_cmdAutoscale_clicked();
+	void on_comboBox_currentIndexChanged(const QString &points);
+	void on_cmdZoomIn_clicked();
+	void on_cmdZoomOut_clicked();
 };

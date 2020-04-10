@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>709</width>
-    <height>564</height>
+    <width>953</width>
+    <height>582</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>GPIB-SoftScope</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -64,16 +64,162 @@
      </layout>
     </item>
     <item>
-     <widget class="QwtPlot" name="qwtPlot">
-      <property name="canvasBackground">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </brush>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
+      <widget class="QwtPlot" name="qwtPlot">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="canvasBackground">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </property>
+      </widget>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>200</height>
+        </size>
+       </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="tabGeneral">
+        <attribute name="title">
+         <string>General</string>
+        </attribute>
+        <widget class="QPushButton" name="cmdAutoscale">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>20</y>
+           <width>80</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Autoscale</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tabHorizontal">
+        <attribute name="title">
+         <string>Timebase</string>
+        </attribute>
+        <widget class="QWidget" name="formLayoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>341</width>
+           <height>121</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Points</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBox">
+            <item>
+             <property name="text">
+              <string>512</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>1024</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>2048</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4096</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>8192</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>16384</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>32768</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QPushButton" name="cmdZoomIn">
+         <property name="geometry">
+          <rect>
+           <x>400</x>
+           <y>30</y>
+           <width>80</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Zoom in</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="cmdZoomOut">
+         <property name="geometry">
+          <rect>
+           <x>520</x>
+           <y>30</y>
+           <width>80</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Zoom out</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tabVertical">
+        <attribute name="title">
+         <string>Channels</string>
+        </attribute>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -83,7 +229,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>709</width>
+     <width>953</width>
      <height>22</height>
     </rect>
    </property>
