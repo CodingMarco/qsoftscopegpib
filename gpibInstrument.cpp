@@ -1,4 +1,5 @@
 #include "gpibInstrument.h"
+#include <unistd.h>
 #include <gpib/ib.h>
 #include <QDebug>
 #include <QMessageBox>
@@ -36,6 +37,17 @@ bool GpibInstrument::openInstrument(int addr)
 		return true;
 	}
 
+}
+
+bool GpibInstrument::closeInstrument()
+{
+	if(this->isOpen())
+	{
+		ibonl(instr, 0);
+		instr = -1;
+		return true;
+	}
+	return false;
 }
 
 bool GpibInstrument::isOpen()
@@ -83,4 +95,46 @@ QString GpibInstrument::query(QString cmd, int param)
 		return this->readString();
 	else
 		return "";
+}
+
+int GpibInstrument::parseBlockData()
+{
+	char blockData[10];
+	memset(blockData, 0, sizeof(blockData));
+	status = ibrd(instr, blockData, sizeof(blockData));
+
+	if(status < 0)
+		qDebug() << "Failed to read block data";
+
+	int i = 2;
+	while(i < 8)
+	{
+		if(blockData[i] != '0')
+			break;
+		i++;
+	}
+
+	char dataBytes[10-i+1];
+	memcpy(dataBytes, blockData+i, 10-i);
+	dataBytes[10-i] = '\0';
+
+	QString nr(dataBytes);
+	int nrint = nr.toInt();
+	return nrint;
+}
+
+QByteArray GpibInstrument::readData(int bytesToRead)
+{
+	QByteArray data;
+	data.reserve(bytesToRead);
+	data.resize(bytesToRead);
+	data.fill(0);
+	status = ibrd(instr, data.data(), bytesToRead);
+	return data;
+}
+
+QByteArray GpibInstrument::readAllData()
+{
+	int bytesToRead = parseBlockData();
+	return readData(bytesToRead);
 }

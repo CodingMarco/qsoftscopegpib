@@ -29,6 +29,13 @@
       </item>
       <item>
        <widget class="QPushButton" name="cmdSend">
+        <property name="text">
+         <string>Send</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cmdQuery">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -96,7 +103,6 @@
     <property name="title">
      <string>Apps</string>
     </property>
-    <addaction name="actionFequencyResponse_Analysis"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuInstrument"/>

@@ -17,31 +17,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     connectdialog.cpp \
-    fraDialog.cpp \
     gpibInstrument.cpp \
-    instrumentConnection.cpp \
     main.cpp \
     mainwindow.cpp \
-    scope.cpp \
-    visaInstrument.cpp
+    scope.cpp
 
 HEADERS += \
     connectdialog.h \
-    fraDialog.h \
     gpibInstrument.h \
-    instrumentConnection.h \
     mainwindow.h \
     scope.h \
-    scopeNamespace.h \
-    visaInstrument.h
+    scopeNamespace.h
 
 FORMS += \
     connectdialog.ui \
-    fradialog.ui \
     mainwindow.ui
 
-LIBS += -lgpib \
-        -lvisa
+LIBS += -lgpib
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

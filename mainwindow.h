@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scope.h"
-#include "instrumentConnection.h"
 #include <QMainWindow>
 #include <qwt/qwt_plot_curve.h>
 #include <QCloseEvent>
@@ -20,8 +19,7 @@ public:
 
 private:
 	Ui::MainWindow *ui;
-	InstrumentConnection* instrumentConnection = nullptr;
-	Scope* scope = nullptr;
+	Scope scope;
 	QwtPlotCurve* waveformCurve = nullptr;
 	QTimer *wftimer = nullptr;
 
@@ -34,6 +32,6 @@ private slots:
 	void on_cmdStop_clicked();
 	void on_actionConnect_triggered();
 	void on_actionInfo_triggered();
-	void on_actionFequencyResponse_Analysis_triggered();
+	void on_cmdQuery_clicked();
 	void on_cmdSend_clicked();
 };

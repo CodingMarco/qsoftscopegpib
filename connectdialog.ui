@@ -17,28 +17,10 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QRadioButton" name="radioButtonVisa">
-         <property name="text">
-          <string>VISA</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="radioButtonGpib">
-         <property name="text">
-          <string>GPIB</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
       <widget class="QPushButton" name="cmdSearch">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Search for instruments</string>
        </property>
@@ -53,7 +35,7 @@
        <item>
         <widget class="QLabel" name="lblVisaAddr">
          <property name="text">
-          <string>VISA Address</string>
+          <string>Name</string>
          </property>
         </widget>
        </item>
@@ -90,7 +72,7 @@
        <item>
         <widget class="QSpinBox" name="spinBoxGpibAddr">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="maximum">
           <number>32</number>
@@ -142,7 +124,7 @@
      <item>
       <widget class="QPushButton" name="cmdConnect">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>Connect</string>

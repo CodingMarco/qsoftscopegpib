@@ -4,13 +4,14 @@
 #include <QVector>
 #include <QMap>
 #include "scopeNamespace.h"
-#include "instrumentConnection.h"
+#include "gpibInstrument.h"
 
-class Scope : public QObject
+class Scope : public GpibInstrument
 {
 	Q_OBJECT
+
 public:
-	explicit Scope(InstrumentConnection *m_instrumentConnection, QObject *parent = nullptr);
+	explicit Scope();
 
 	// Get data
 	QVector<ushort> getWaveformData();
@@ -24,20 +25,17 @@ public:
 	// Get parameters
 	POINTS points() { return this->_points; }
 	double timebaseRange() { return this->_timebaseRange; }
-	double channelRange() { return instrumentConnection->query("CHANNEL1:RANGE?").toDouble(); }
-	QString idn() { return instrumentConnection->query("*IDN?"); }
+	double channelRange() { return query("CHANNEL1:RANGE?").toDouble(); }
+	QString idn() { return query("*IDN?"); }
 	QMap<QString, double> waveformPreamble();
 
 	// Misc
 	void autoscale();
-	bool writeCmd(QString cmd);
-	QString query(QString cmd);
+	bool digitize();
 
 private:
-	InstrumentConnection* instrumentConnection = nullptr;
-
 	// Scope properties
-	int _sourceChannel = -1;
+	int _sourceChannel = 1;
 	int _bytesPerPoint = -1;
 	double _timebaseRange = -1;
 	QVector<double> _channelsRange;
@@ -50,8 +48,6 @@ private:
 
 	// Read / update parameters from oscilloscope
 	double updateTimebaseRange();
-
-	bool digitize();
 
 signals:
 	void timebaseRangeUpdated(double m_timebaseRange);
