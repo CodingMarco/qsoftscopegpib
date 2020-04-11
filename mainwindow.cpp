@@ -3,6 +3,7 @@
 #include "scope.h"
 #include "scopeNamespace.h"
 #include "connectdialog.h"
+#include "timebaseScaleDraw.h"
 
 #include <unistd.h>
 #include <qwt/qwt_plot.h>
@@ -30,7 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
 	waveformCurve->attach(ui->qwtPlot);
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, false);
-	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1, 5);
+	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.02, 0.02);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;

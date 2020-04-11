@@ -20,14 +20,18 @@ SOURCES += \
     gpibInstrument.cpp \
     main.cpp \
     mainwindow.cpp \
-    scope.cpp
+    scope.cpp \
+    timePoint.cpp \
+    timebaseScaleDraw.cpp
 
 HEADERS += \
     connectdialog.h \
     gpibInstrument.h \
     mainwindow.h \
     scope.h \
-    scopeNamespace.h
+    scopeNamespace.h \
+    timePoint.h \
+    timebaseScaleDraw.h
 
 FORMS += \
     connectdialog.ui \
