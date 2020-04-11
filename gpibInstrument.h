@@ -26,6 +26,7 @@ public:
 	bool isOpen();
 	bool writeCmd(QString cmd);
 	bool writeCmd(QString cmd, int param);
+	bool writeCmd(QString cmd, QString param);
 	QString readString();
 	QString query(QString cmd);
 	QString query(QString cmd, int param);

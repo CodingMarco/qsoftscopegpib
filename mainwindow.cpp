@@ -24,13 +24,13 @@ MainWindow::MainWindow(QWidget *parent)
 	wftimer = new QTimer(this);
 
 	connect(wftimer, SIGNAL(timeout()), this, SLOT(plotWaveform()));
+	connect(&scope, SIGNAL(timebaseRangeUpdated(double)), this, SLOT(updateTimebaseRange(double)));
 
 	waveformCurve = new QwtPlotCurve("Waveform");
 	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
 	waveformCurve->attach(ui->qwtPlot);
-	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, true);
-	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
-	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -3, 3, 0.5);
+	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, false);
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1, 5);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;
@@ -49,6 +49,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+	on_cmdStop_clicked();
 	scope.closeInstrument();
 	event->accept();
 }
@@ -59,7 +60,11 @@ bool MainWindow::autoconnect()
 	scope.setFormat(WAVEFORM_FORMAT_WORD);
 	scope.setPoints(POINTS_512);
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
+	scope.setTimebaseReference(CENTER);
 	scope.writeCmd(":TIMEBASE:SAMPlE:CLOCK AUTO");
+	scope.initializeParameters();
+	updateTimebaseRange(scope.timebaseRange());
+	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	return true;
 }
 
@@ -112,7 +117,7 @@ void MainWindow::on_cmdAutoscale_clicked()
 	scope.autoscale();
 }
 
-void MainWindow::on_comboBox_currentIndexChanged(const QString &points)
+void MainWindow::on_comboBoxPoints_currentIndexChanged(const QString &points)
 {
 	scope.setPoints(POINTS(points.toInt()));
 }
@@ -125,4 +130,32 @@ void MainWindow::on_cmdZoomIn_clicked()
 void MainWindow::on_cmdZoomOut_clicked()
 {
 	scope.zoomOut();
+}
+
+void MainWindow::updateTimebaseRange(double range)
+{
+	ui->lblTimebaseRangeNumber->setText(QString::number(range, 'e', 0));
+	// compensate number of points. On scope screen, always 512 points are displayed. We want to display them all.
+	range *= (scope.points() / 512);
+	switch(scope.timebaseReference()) {
+		case LEFT:
+			ui->qwtPlot->setAxisScale(QwtPlot::xBottom, 0, range);
+			break;
+		case CENTER:
+			ui->qwtPlot->setAxisScale(QwtPlot::xBottom, -(range/2), range/2);
+			break;
+		case RIGHT:
+			ui->qwtPlot->setAxisScale(QwtPlot::xBottom, -range, 0);
+			break;
+	}
+}
+
+void MainWindow::on_comboBoxReference_currentIndexChanged(int reference_mode)
+{
+	scope.setTimebaseReference(TIMEBASE_REFERENCE(reference_mode));
+	if(reference_mode == CENTER)
+		ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
+	else
+		ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, false);
+	updateTimebaseRange(scope.timebaseRange());
 }

@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <QtEndian>
 #include <QMessageBox>
+#include <QtMath>
 
 Scope::Scope()
 {
@@ -39,7 +40,8 @@ double Scope::updateTimebaseRange()
 bool Scope::setTimebaseRange(double range)
 {
 	writeCmd(QString(":TIMEBASE:RANGE ") + QString::number(range));
-	_timebaseRange = range;
+	_timebaseRange = updateTimebaseRange();
+	emit timebaseRangeUpdated(_timebaseRange);
 	return true;
 }
 
@@ -63,11 +65,25 @@ QVector<QPointF> Scope::digitizeAndGetPoints()
 	return pointData;
 }
 
-bool Scope::setPoints(POINTS m_points)
+bool Scope::setPoints(POINTS newPoints)
 {
-	_points = m_points;
-	writeCmd(QString(":ACQUIRE:POINTS "), m_points);
+	int oldPoints = _points;
+	_points = newPoints;
+	writeCmd(QString(":ACQUIRE:POINTS "), newPoints);
 	updateTimebaseRange();
+
+	if(oldPoints != -1)
+	{
+		int howOftenToZoom = log2(double(newPoints) / oldPoints);
+		for(int i = 0; i < abs(howOftenToZoom); i++)
+		{
+			if(howOftenToZoom < 0)
+				zoomOut();
+			else
+				zoomIn();
+		}
+	}
+
 	return true;
 }
 
@@ -116,14 +132,37 @@ bool Scope::setAcquireType(ACQUIRE_TYPE m_type)
 	return true;
 }
 
+void Scope::setTimebaseReference(TIMEBASE_REFERENCE m_reference)
+{
+	this->_timebaseReference = m_reference;
+	switch(this->_timebaseReference) {
+		case LEFT:
+			writeCmd(":TIMEBASE:REFERENCE LEFT");
+			break;
+		case CENTER:
+			writeCmd(":TIMEBASE:REFERENCE CENTER");
+			break;
+		case RIGHT:
+			writeCmd(":TIMEBASE:REFERENCE RIGHT");
+			break;
+	}
+}
+
 bool Scope::zoomIn()
 {
-	return setTimebaseRange(_timebaseRange * 0.5);
+	int currentFirstDigit = (int)QString::number(timebaseRange(), 'e', 0).at(0).digitValue();
+	return setTimebaseRange(timebaseRange() * (currentFirstDigit == 5 ? 0.4 : 0.5));
 }
 
 bool Scope::zoomOut()
 {
-	return setTimebaseRange(_timebaseRange * 2);
+	int currentFirstDigit = (int)QString::number(timebaseRange(), 'e', 0).at(0).digitValue();
+	return setTimebaseRange(timebaseRange() * (currentFirstDigit == 2 ? 2.5 : 2));
+}
+
+void Scope::initializeParameters()
+{
+	updateTimebaseRange();
 }
 
 QMap<QString, double> Scope::getWaveformPreamble()
@@ -143,6 +182,7 @@ void Scope::autoscale()
 {
 	writeCmd(":autoscale");
 	setPoints(_points);
+	setTimebaseReference(_timebaseReference);
 }
 
 bool Scope::digitize()

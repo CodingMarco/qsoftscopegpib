@@ -18,10 +18,11 @@ public:
 	QVector<QPointF> digitizeAndGetPoints();
 
 	// Set parameters
-	bool setPoints(POINTS m_points);
+	bool setPoints(POINTS newPoints);
 	bool setFormat(WAVEFORM_FORMAT m_format);
 	bool setSourceChannel(int m_channel);
 	bool setAcquireType(ACQUIRE_TYPE m_type);
+	void setTimebaseReference(TIMEBASE_REFERENCE m_reference);
 	bool zoomIn();
 	bool zoomOut();
 
@@ -30,8 +31,10 @@ public:
 	QString idn() { return query("*IDN?"); }
 	double timebaseRange() { return this->_timebaseRange; }
 	double channelRange(int channel) { return _channelsRange[channel]; }
+	TIMEBASE_REFERENCE timebaseReference() { return _timebaseReference; }
 
 	// Misc
+	void initializeParameters();
 	void autoscale();
 	bool digitize();
 
@@ -41,9 +44,10 @@ private:
 	int _bytesPerPoint = -1;
 	double _timebaseRange = -1;
 	QVector<double> _channelsRange;
-	POINTS _points;
+	POINTS _points = POINTS(-1);
 	WAVEFORM_FORMAT _format;
 	ACQUIRE_TYPE _acquireType;
+	TIMEBASE_REFERENCE _timebaseReference;
 
 	// Misc
 	bool _printCommands = false;

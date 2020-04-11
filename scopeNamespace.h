@@ -22,7 +22,16 @@ enum ACQUIRE_TYPE {
 	ACQUIRE_TYPE_RAW
 };
 
-enum CONNECTION_TYPE {
-	CONNECTION_TYPE_USB,
-	CONNECTION_TYPE_GPIB
+enum TIMEBASE_REFERENCE {
+	LEFT,
+	CENTER,
+	RIGHT
+};
+
+struct ScopeSettings
+{
+	POINTS points;
+	WAVEFORM_FORMAT waveformFormat;
+	ACQUIRE_TYPE acquireType;
+	TIMEBASE_REFERENCE timebaseReference;
 };

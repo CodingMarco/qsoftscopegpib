@@ -37,7 +37,6 @@ bool GpibInstrument::openInstrument(int addr)
 		qDebug() << "Opened GPIB instrument with IDN: " << idn;
 		return true;
 	}
-
 }
 
 bool GpibInstrument::closeInstrument()
@@ -69,6 +68,16 @@ bool GpibInstrument::writeCmd(QString cmd, int param)
 	if(cmd.endsWith('\n'))
 		cmd.remove('\n');
 	cmd.append(QString::number(param));
+	cmd.append('\n');
+	return writeCmd(cmd);
+}
+
+bool GpibInstrument::writeCmd(QString cmd, QString param)
+{
+	if(cmd.endsWith('\n'))
+		cmd.remove('\n');
+	cmd.append(' ');
+	cmd.append(param);
 	cmd.append('\n');
 	return writeCmd(cmd);
 }
