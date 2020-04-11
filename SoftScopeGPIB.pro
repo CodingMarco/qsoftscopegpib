@@ -16,22 +16,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    commonFunctions.cpp \
     connectdialog.cpp \
     gpibInstrument.cpp \
     main.cpp \
     mainwindow.cpp \
-    scope.cpp \
-    timePoint.cpp \
-    timebaseScaleDraw.cpp
+    scope.cpp
 
 HEADERS += \
+    commonFunctions.h \
     connectdialog.h \
+    customAxisScaleDraw.h \
     gpibInstrument.h \
     mainwindow.h \
     scope.h \
-    scopeNamespace.h \
-    timePoint.h \
-    timebaseScaleDraw.h
+    scopeNamespace.h
 
 FORMS += \
     connectdialog.ui \

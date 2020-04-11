@@ -1,9 +1,9 @@
 #pragma once
 
-#include "scope.h"
 #include <QMainWindow>
 #include <qwt/qwt_plot_curve.h>
 #include <QCloseEvent>
+#include "scope.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

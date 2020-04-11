@@ -1,9 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "scope.h"
 #include "scopeNamespace.h"
 #include "connectdialog.h"
-#include "timebaseScaleDraw.h"
+#include "customAxisScaleDraw.h"
 
 #include <unistd.h>
 #include <qwt/qwt_plot.h>
@@ -28,10 +27,12 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(&scope, SIGNAL(timebaseRangeUpdated(double)), this, SLOT(updateTimebaseRange(double)));
 
 	waveformCurve = new QwtPlotCurve("Waveform");
+	waveformCurve->setStyle(QwtPlotCurve::Lines);
 	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
 	waveformCurve->attach(ui->qwtPlot);
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, false);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
+	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
 	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.02, 0.02);
 
 	// Grid
@@ -84,7 +85,10 @@ void MainWindow::on_cmdStart_clicked()
 
 void MainWindow::on_cmdStop_clicked()
 {
-	wftimer->stop();
+	if(wftimer->isActive())
+		wftimer->stop();
+	else
+		plotWaveform();
 }
 
 void MainWindow::on_actionConnect_triggered()

@@ -57,7 +57,7 @@
       <item>
        <widget class="QPushButton" name="cmdStop">
         <property name="text">
-         <string>Stop</string>
+         <string>Stop / Single</string>
         </property>
        </widget>
       </item>
@@ -200,20 +200,6 @@
             </item>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lblTimebaseRange">
-            <property name="text">
-             <string>Timebase range</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="lblTimebaseRangeNumber">
-            <property name="text">
-             <string>10</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="lblReference">
             <property name="text">
@@ -247,6 +233,20 @@
               <string>Right</string>
              </property>
             </item>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lblTimebaseRange">
+            <property name="text">
+             <string>Timebase range</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="lblTimebaseRangeNumber">
+            <property name="text">
+             <string>NULL</string>
+            </property>
            </widget>
           </item>
          </layout>

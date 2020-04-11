@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QString>
+
 typedef unsigned char byte;
 
 enum POINTS {
