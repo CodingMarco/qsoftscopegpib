@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <qwt/qwt_plot_curve.h>
 #include <QCloseEvent>
+#include <QThread>
 #include "scope.h"
 
 QT_BEGIN_NAMESPACE
@@ -20,24 +21,18 @@ public:
 private:
 	Ui::MainWindow *ui;
 	Scope scope;
+	QThread scopeThread;
 	QwtPlotCurve* waveformCurve = nullptr;
-	QTimer *wftimer = nullptr;
 
 	void closeEvent(QCloseEvent* event);
 	bool autoconnect();
 
 private slots:
-	void plotWaveform();
-	void on_cmdStart_clicked();
-	void on_cmdStop_clicked();
+	void plotWaveform(WaveformPointsVector waveformData);
 	void on_actionConnect_triggered();
 	void on_actionInfo_triggered();
 	void on_cmdQuery_clicked();
 	void on_cmdSend_clicked();
-	void on_cmdAutoscale_clicked();
-	void on_comboBoxPoints_currentIndexChanged(const QString &points);
-	void on_cmdZoomIn_clicked();
-	void on_cmdZoomOut_clicked();
 	void updateTimebaseRange(double range);
 	void on_comboBoxReference_currentIndexChanged(int reference_mode);
 };

@@ -1,8 +1,11 @@
 #pragma once
 
 #include <QString>
+#include <QVector>
+#include <QPointF>
 
 typedef unsigned char byte;
+typedef QVector<QPointF> WaveformPointsVector;
 
 enum POINTS {
 	POINTS_512 = 512,

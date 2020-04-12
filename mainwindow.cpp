@@ -21,10 +21,23 @@ MainWindow::MainWindow(QWidget *parent)
 	  ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	wftimer = new QTimer(this);
+	scope.moveToThread(&scopeThread);
 
-	connect(wftimer, SIGNAL(timeout()), this, SLOT(plotWaveform()));
 	//connect(&scope, SIGNAL(timebaseRangeUpdated(double)), this, SLOT(updateTimebaseRange(double)));
+
+	// Buttons and other controls
+	connect(ui->cmdStart, &QPushButton::clicked, &scope, &Scope::startWaveformUpdate);
+	connect(ui->cmdStop, &QPushButton::clicked, &scope, &Scope::stopWaveformUpdate);
+	connect(ui->cmdZoomIn, &QPushButton::clicked, &scope, &Scope::zoomIn);
+	connect(ui->cmdZoomOut, &QPushButton::clicked, &scope, &Scope::zoomOut);
+	connect(ui->cmdAutoscale, &QPushButton::clicked, &scope, &Scope::autoscale);
+	connect(ui->comboBoxPoints, SIGNAL(currentIndexChanged(QString)), &scope, SLOT(setPoints(QString)));
+
+	// Scope thread stuff
+	connect(&scope, SIGNAL(waveformUpdated(WaveformPointsVector)), this, SLOT(plotWaveform(WaveformPointsVector)));
+	connect(&scopeThread, SIGNAL(started()), &scope, SLOT(initializeThreadRelatedStuff()));
+
+	scopeThread.start();
 
 	waveformCurve = new QwtPlotCurve("Waveform");
 	waveformCurve->setStyle(QwtPlotCurve::Lines);
@@ -52,8 +65,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-	on_cmdStop_clicked();
+	scope.stopWaveformUpdate();
 	scope.closeInstrument();
+	scopeThread.quit();
 	event->accept();
 }
 
@@ -64,31 +78,14 @@ bool MainWindow::autoconnect()
 	scope.setPoints(POINTS_512);
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
 	scope.setTimebaseReference(CENTER);
-	//scope.writeCmd(":TIMEBASE:SAMPlE:CLOCK AUTO");
-	scope.initializeParameters();
-	//updateTimebaseRange(scope.timebaseRange());
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	return true;
 }
 
-void MainWindow::plotWaveform()
+void MainWindow::plotWaveform(WaveformPointsVector waveformData)
 {
-	auto waveformData = scope.digitizeAndGetPoints();
 	waveformCurve->setSamples(waveformData);
 	ui->qwtPlot->replot();
-}
-
-void MainWindow::on_cmdStart_clicked()
-{
-	wftimer->start();
-}
-
-void MainWindow::on_cmdStop_clicked()
-{
-	if(wftimer->isActive())
-		wftimer->stop();
-	else
-		plotWaveform();
 }
 
 void MainWindow::on_actionConnect_triggered()
@@ -108,40 +105,28 @@ void MainWindow::on_actionInfo_triggered()
 void MainWindow::on_cmdQuery_clicked()
 {
 	if(scope.isOpen())
-		QMessageBox::information(this, "Response", scope.query(ui->lineEditCommand->text()));
+	{
+		QString response;
+		QMetaObject::invokeMethod(&scope, "query", Qt::BlockingQueuedConnection, Q_RETURN_ARG(QString, response),
+								  Q_ARG(QString, ui->lineEditCommand->text()));
+		QMessageBox::information(this, "Response", response);
+	}
 	else
 		QMessageBox::information(this, "Not connected", "Error: Scope not connected!");
 }
 
 void MainWindow::on_cmdSend_clicked()
 {
-	scope.writeCmd(ui->lineEditCommand->text());
-}
-
-void MainWindow::on_cmdAutoscale_clicked()
-{
-	scope.autoscale();
-}
-
-void MainWindow::on_comboBoxPoints_currentIndexChanged(const QString &points)
-{
-	scope.setPoints(POINTS(points.toInt()));
-}
-
-void MainWindow::on_cmdZoomIn_clicked()
-{
-	scope.zoomIn();
-}
-
-void MainWindow::on_cmdZoomOut_clicked()
-{
-	scope.zoomOut();
+	if(scope.isOpen())
+		QMetaObject::invokeMethod(&scope, "writeCmd", Q_ARG(QString, ui->lineEditCommand->text()));
+	else
+		QMessageBox::information(this, "Not connected", "Error: Scope not connected!");
 }
 
 void MainWindow::updateTimebaseRange(double range)
 {
 	ui->lblTimebaseRangeNumber->setText(QString::number(range, 'e', 0));
-	// compensate number of points. On scope screen, always 500 points are displayed. We want to display them all.
+	// Compensate number of points. On scope screen, always 500 points are displayed. We want to display them all.
 	range *= (scope.points() / 512);
 	switch(scope.timebaseReference()) {
 		case LEFT:
@@ -158,10 +143,11 @@ void MainWindow::updateTimebaseRange(double range)
 
 void MainWindow::on_comboBoxReference_currentIndexChanged(int reference_mode)
 {
-	scope.setTimebaseReference(TIMEBASE_REFERENCE(reference_mode));
+	QMetaObject::invokeMethod(&scope, "setTimebaseReference",
+							  Q_ARG(TIMEBASE_REFERENCE, TIMEBASE_REFERENCE(reference_mode)));
 	if(reference_mode == CENTER)
 		ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	else
 		ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, false);
-	updateTimebaseRange(scope.timebaseRange());
+	//updateTimebaseRange(scope.timebaseRange());
 }

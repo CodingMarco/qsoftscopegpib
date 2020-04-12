@@ -33,7 +33,7 @@ QVector<ushort> Scope::getWaveformData()
 double Scope::updateTimebaseRange()
 {
 	updateSampleRate();
-	this->_timebaseRange = this->_points / this->_sampleRate;
+	this->_timebaseRange = this->_points / this->validSampleRates[_sampleRateIndex];
 	emit timebaseRangeUpdated(this->_timebaseRange);
 	return this->_timebaseRange;
 }
@@ -41,28 +41,28 @@ double Scope::updateTimebaseRange()
 int Scope::updateSampleRate()
 {
 	QString sampleRateWithSi = query(":TIMEBASE:SAMPLE:CLOCK?").remove("Sa/s");
-	int m_sampleRate = -1;
+	int newSampleRate = -1;
 	if(sampleRateWithSi.endsWith(' '))
 	{
-		m_sampleRate = sampleRateWithSi.remove(' ').toInt();
+		newSampleRate = sampleRateWithSi.remove(' ').toInt();
 	}
 	else if(sampleRateWithSi.endsWith(" k"))
 	{
-		m_sampleRate = sampleRateWithSi.remove(" k").toInt() * 1e3;
+		newSampleRate = sampleRateWithSi.remove(" k").toInt() * 1e3;
 	}
 	else if(sampleRateWithSi.endsWith(" M"))
 	{
-		m_sampleRate = sampleRateWithSi.remove(" M").toInt() * 1e6;
+		newSampleRate = sampleRateWithSi.remove(" M").toInt() * 1e6;
 	}
 	else if(sampleRateWithSi.endsWith(" G"))
 	{
-		m_sampleRate = sampleRateWithSi.remove(" G").toInt() * 1e9;
+		newSampleRate = sampleRateWithSi.remove(" G").toInt() * 1e9;
 	}
 
-	if(m_sampleRate != -1 && m_sampleRate != 0)
+	if(newSampleRate != -1 && newSampleRate != 0)
 	{
-		_sampleRate = m_sampleRate;
-		return m_sampleRate;
+		_sampleRateIndex = validSampleRates.indexOf(newSampleRate);
+		return newSampleRate;
 	}
 	else
 	{
@@ -71,33 +71,22 @@ int Scope::updateSampleRate()
 	}
 }
 
-bool Scope::setTimebaseRange(double range)
+bool Scope::setSampleRateByIndex(int m_sampleRateIndex)
 {
-	writeCmd(QString(":TIMEBASE:RANGE ") + QString::number(range));
-	_timebaseRange = updateTimebaseRange();
-	emit timebaseRangeUpdated(_timebaseRange);
-	return true;
-}
-
-bool Scope::setSampleRate(int m_sampleRate)
-{
-	if((!QString::number(m_sampleRate).startsWith("10") &&
-		!QString::number(m_sampleRate).startsWith("25") &&
-		!QString::number(m_sampleRate).startsWith("50") &&
-		m_sampleRate != 2e9) || m_sampleRate > 2e9)
+	if(m_sampleRateIndex >= 0 && m_sampleRateIndex < validSampleRates.size())
 	{
-		qCritical() << "[CRITICAL]: setSampleRate(): Invalid sample rate " << QString::number(m_sampleRate);
-		return false;
+		writeCmd(QString(":TIMEBASE:SAMPLE:CLOCK ") + QString::number(validSampleRates[m_sampleRateIndex]));
+		_sampleRateIndex = m_sampleRateIndex;
+		return true;
 	}
 	else
 	{
-		writeCmd(QString(":TIMEBASE:SAMPLE:CLOCK ") + QString::number(m_sampleRate));
-		_sampleRate = m_sampleRate;
-		return true;
+		qCritical() << "[CRITICAL]: setSampleRateIndex(): Index out of range!";
+		return false;
 	}
 }
 
-QVector<QPointF> Scope::digitizeAndGetPoints()
+void Scope::digitizeAndGetPoints()
 {
 	if(_timebaseRange == -1)
 		updateTimebaseRange();
@@ -106,7 +95,7 @@ QVector<QPointF> Scope::digitizeAndGetPoints()
 	writeCmd(":WAVEFORM:DATA?");
 
 	QVector<ushort> yRawData = readAllWordData();
-	QVector<QPointF> pointData;
+	WaveformPointsVector pointData;
 	pointData.reserve(this->points());
 
 	for(int x = 0; x < this->points(); x++)
@@ -114,7 +103,12 @@ QVector<QPointF> Scope::digitizeAndGetPoints()
 		pointData.append({	(double(x)-preamble["xreference"]) * preamble["xincrement"] + preamble["xorigin"],
 							(double(yRawData[x])-preamble["yreference"]) * preamble["yincrement"] + preamble["yorigin"]	});
 	}
-	return pointData;
+	emit(waveformUpdated(pointData));
+}
+
+bool Scope::setPoints(QString newPoints)
+{
+	return setPoints(POINTS(newPoints.toInt()));
 }
 
 bool Scope::setPoints(POINTS newPoints)
@@ -135,7 +129,6 @@ bool Scope::setPoints(POINTS newPoints)
 				zoomIn();
 		}
 	}
-
 	return true;
 }
 
@@ -202,33 +195,24 @@ void Scope::setTimebaseReference(TIMEBASE_REFERENCE m_reference)
 
 bool Scope::zoomIn()
 {
-	if(_sampleRate == 1e9) // After 1 GSa/s comes 2, not 2.5
-		return setSampleRate(2e9);
-	else if(_sampleRate < 2e9)
-	{
-		int currentFirstDigit = (int)QString::number(_sampleRate, 'e', 1).at(0).digitValue();
-		return setSampleRate(_sampleRate * (currentFirstDigit == 1 ? 2.5 : 2));
-	}
-	else // Maximum zoom in reached
+	if(_sampleRateIndex > 0)
+		return setSampleRateByIndex(_sampleRateIndex-1);
+	else // This is a normal condition, maximum zoom in is reached.
 		return false;
 }
 
 bool Scope::zoomOut()
 {
-	if(_sampleRate == 2e9) // Before 2 GSa/s comes 1
-		return setSampleRate(1e9);
-	else if(_sampleRate > 1e3)
-	{
-		int currentFirstDigit = (int)QString::number(double(_sampleRate), 'e', 1).at(0).digitValue();
-		return setSampleRate(_sampleRate * (currentFirstDigit == 2 ? 0.4 : 0.5));
-	}
-	else // Maximum zoom out reached
+	if(_sampleRateIndex < validSampleRates.size()-1)
+		return setSampleRateByIndex(_sampleRateIndex+1);
+	else // This is a normal condition, maximum zoom out is reached.
 		return false;
 }
 
-void Scope::initializeParameters()
+void Scope::initializeThreadRelatedStuff()
 {
-	updateTimebaseRange();
+	waveformUpdateTimer = new QTimer(this);
+	connect(waveformUpdateTimer, SIGNAL(timeout()), this, SLOT(digitizeAndGetPoints()));
 }
 
 QMap<QString, double> Scope::getWaveformPreamble()
@@ -249,6 +233,11 @@ void Scope::autoscale()
 	writeCmd(":autoscale");
 	setPoints(_points);
 	setTimebaseReference(_timebaseReference);
+}
+
+void Scope::singleWaveformUpdate()
+{
+	digitizeAndGetPoints();
 }
 
 bool Scope::digitize()
