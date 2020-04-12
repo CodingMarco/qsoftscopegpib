@@ -24,16 +24,16 @@ MainWindow::MainWindow(QWidget *parent)
 	wftimer = new QTimer(this);
 
 	connect(wftimer, SIGNAL(timeout()), this, SLOT(plotWaveform()));
-	connect(&scope, SIGNAL(timebaseRangeUpdated(double)), this, SLOT(updateTimebaseRange(double)));
+	//connect(&scope, SIGNAL(timebaseRangeUpdated(double)), this, SLOT(updateTimebaseRange(double)));
 
 	waveformCurve = new QwtPlotCurve("Waveform");
 	waveformCurve->setStyle(QwtPlotCurve::Lines);
 	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
 	waveformCurve->attach(ui->qwtPlot);
-	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, false);
+	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, true);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
-	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.02, 0.02);
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1, 0.3);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;
@@ -64,9 +64,9 @@ bool MainWindow::autoconnect()
 	scope.setPoints(POINTS_512);
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
 	scope.setTimebaseReference(CENTER);
-	scope.writeCmd(":TIMEBASE:SAMPlE:CLOCK AUTO");
+	//scope.writeCmd(":TIMEBASE:SAMPlE:CLOCK AUTO");
 	scope.initializeParameters();
-	updateTimebaseRange(scope.timebaseRange());
+	//updateTimebaseRange(scope.timebaseRange());
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	return true;
 }
@@ -141,7 +141,7 @@ void MainWindow::on_cmdZoomOut_clicked()
 void MainWindow::updateTimebaseRange(double range)
 {
 	ui->lblTimebaseRangeNumber->setText(QString::number(range, 'e', 0));
-	// compensate number of points. On scope screen, always 512 points are displayed. We want to display them all.
+	// compensate number of points. On scope screen, always 500 points are displayed. We want to display them all.
 	range *= (scope.points() / 512);
 	switch(scope.timebaseReference()) {
 		case LEFT:

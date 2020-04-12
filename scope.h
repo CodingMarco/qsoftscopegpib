@@ -29,7 +29,7 @@ public:
 	// Get parameters
 	POINTS points() { return this->_points; }
 	QString idn() { return query("*IDN?"); }
-	double timebaseRange() { return this->_timebaseRange; }
+	double timebaseRange() { return this->_points / this->_sampleRate; }
 	double channelRange(int channel) { return _channelsRange[channel]; }
 	TIMEBASE_REFERENCE timebaseReference() { return _timebaseReference; }
 
@@ -42,6 +42,7 @@ private:
 	// Scope properties
 	int _sourceChannel = 1;
 	int _bytesPerPoint = -1;
+	int _sampleRate = -1;
 	double _timebaseRange = -1;
 	QVector<double> _channelsRange;
 	POINTS _points = POINTS(-1);
@@ -56,9 +57,11 @@ private:
 	QMap<QString, double> getWaveformPreamble();
 	QVector<ushort> getWaveformData();
 	double updateTimebaseRange();
+	int updateSampleRate();
 
 	// Set horizontal and vertical parameters
 	bool setTimebaseRange(double range);
+	bool setSampleRate(int m_sampleRate);
 
 signals:
 	void timebaseRangeUpdated(double m_timebaseRange);

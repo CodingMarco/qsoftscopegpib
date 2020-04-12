@@ -32,9 +32,43 @@ QVector<ushort> Scope::getWaveformData()
 
 double Scope::updateTimebaseRange()
 {
-	this->_timebaseRange = query(":TIMEBASE:RANGE?").toDouble();
+	updateSampleRate();
+	this->_timebaseRange = this->_points / this->_sampleRate;
 	emit timebaseRangeUpdated(this->_timebaseRange);
 	return this->_timebaseRange;
+}
+
+int Scope::updateSampleRate()
+{
+	QString sampleRateWithSi = query(":TIMEBASE:SAMPLE:CLOCK?").remove("Sa/s");
+	int m_sampleRate = -1;
+	if(sampleRateWithSi.endsWith(' '))
+	{
+		m_sampleRate = sampleRateWithSi.remove(' ').toInt();
+	}
+	else if(sampleRateWithSi.endsWith(" k"))
+	{
+		m_sampleRate = sampleRateWithSi.remove(" k").toInt() * 1e3;
+	}
+	else if(sampleRateWithSi.endsWith(" M"))
+	{
+		m_sampleRate = sampleRateWithSi.remove(" M").toInt() * 1e6;
+	}
+	else if(sampleRateWithSi.endsWith(" G"))
+	{
+		m_sampleRate = sampleRateWithSi.remove(" G").toInt() * 1e9;
+	}
+
+	if(m_sampleRate != -1 && m_sampleRate != 0)
+	{
+		_sampleRate = m_sampleRate;
+		return m_sampleRate;
+	}
+	else
+	{
+		qCritical() << "[CRITICAL]: Sample rate could not be parsed!";
+		return -1;
+	}
 }
 
 bool Scope::setTimebaseRange(double range)
@@ -43,6 +77,24 @@ bool Scope::setTimebaseRange(double range)
 	_timebaseRange = updateTimebaseRange();
 	emit timebaseRangeUpdated(_timebaseRange);
 	return true;
+}
+
+bool Scope::setSampleRate(int m_sampleRate)
+{
+	if((!QString::number(m_sampleRate).startsWith("10") &&
+		!QString::number(m_sampleRate).startsWith("25") &&
+		!QString::number(m_sampleRate).startsWith("50") &&
+		m_sampleRate != 2e9) || m_sampleRate > 2e9)
+	{
+		qCritical() << "[CRITICAL]: setSampleRate(): Invalid sample rate " << QString::number(m_sampleRate);
+		return false;
+	}
+	else
+	{
+		writeCmd(QString(":TIMEBASE:SAMPLE:CLOCK ") + QString::number(m_sampleRate));
+		_sampleRate = m_sampleRate;
+		return true;
+	}
 }
 
 QVector<QPointF> Scope::digitizeAndGetPoints()
@@ -150,14 +202,28 @@ void Scope::setTimebaseReference(TIMEBASE_REFERENCE m_reference)
 
 bool Scope::zoomIn()
 {
-	int currentFirstDigit = (int)QString::number(timebaseRange(), 'e', 0).at(0).digitValue();
-	return setTimebaseRange(timebaseRange() * (currentFirstDigit == 5 ? 0.4 : 0.5));
+	if(_sampleRate == 1e9) // After 1 GSa/s comes 2, not 2.5
+		return setSampleRate(2e9);
+	else if(_sampleRate < 2e9)
+	{
+		int currentFirstDigit = (int)QString::number(_sampleRate, 'e', 1).at(0).digitValue();
+		return setSampleRate(_sampleRate * (currentFirstDigit == 1 ? 2.5 : 2));
+	}
+	else // Maximum zoom in reached
+		return false;
 }
 
 bool Scope::zoomOut()
 {
-	int currentFirstDigit = (int)QString::number(timebaseRange(), 'e', 0).at(0).digitValue();
-	return setTimebaseRange(timebaseRange() * (currentFirstDigit == 2 ? 2.5 : 2));
+	if(_sampleRate == 2e9) // Before 2 GSa/s comes 1
+		return setSampleRate(1e9);
+	else if(_sampleRate > 1e3)
+	{
+		int currentFirstDigit = (int)QString::number(double(_sampleRate), 'e', 1).at(0).digitValue();
+		return setSampleRate(_sampleRate * (currentFirstDigit == 2 ? 0.4 : 0.5));
+	}
+	else // Maximum zoom out reached
+		return false;
 }
 
 void Scope::initializeParameters()
