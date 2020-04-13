@@ -21,7 +21,8 @@ SOURCES += \
     gpibInstrument.cpp \
     main.cpp \
     mainwindow.cpp \
-    scope.cpp
+    scope.cpp \
+    waveformPlot.cpp
 
 HEADERS += \
     commonFunctions.h \
@@ -30,7 +31,8 @@ HEADERS += \
     gpibInstrument.h \
     mainwindow.h \
     scope.h \
-    scopeNamespace.h
+    scopeNamespace.h \
+    waveformPlot.h
 
 FORMS += \
     connectdialog.ui \

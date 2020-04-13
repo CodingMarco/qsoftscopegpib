@@ -65,41 +65,13 @@
     </item>
     <item>
      <widget class="QSplitter" name="splitter">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="lineWidth">
-       <number>3</number>
-      </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
-      </property>
-      <property name="handleWidth">
-       <number>20</number>
       </property>
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="QwtPlot" name="qwtPlot">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="canvasBackground">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </property>
-      </widget>
+      <widget class="WaveformPlot" name="qwtPlot" native="true"/>
       <widget class="QTabWidget" name="tabWidget">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -336,9 +308,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
-   <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <class>WaveformPlot</class>
+   <extends>QWidget</extends>
+   <header location="global">waveformPlot.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -41,25 +41,22 @@ double Scope::updateTimebaseRange()
 int Scope::updateSampleRate()
 {
 	QString sampleRateWithSi = query(":TIMEBASE:SAMPLE:CLOCK?").remove("Sa/s");
-	int newSampleRate = -1;
-	if(sampleRateWithSi.endsWith(' '))
+	int newSampleRate = 0;
+	if(sampleRateWithSi.contains("AUTO"))
 	{
+		setSampleRateByIndex(10); // 1 MSa/s
+		newSampleRate = 1e6;
+	}
+	else if(sampleRateWithSi.endsWith(' '))
 		newSampleRate = sampleRateWithSi.remove(' ').toInt();
-	}
 	else if(sampleRateWithSi.endsWith(" k"))
-	{
 		newSampleRate = sampleRateWithSi.remove(" k").toInt() * 1e3;
-	}
 	else if(sampleRateWithSi.endsWith(" M"))
-	{
 		newSampleRate = sampleRateWithSi.remove(" M").toInt() * 1e6;
-	}
 	else if(sampleRateWithSi.endsWith(" G"))
-	{
 		newSampleRate = sampleRateWithSi.remove(" G").toInt() * 1e9;
-	}
 
-	if(newSampleRate != -1 && newSampleRate != 0)
+	if(newSampleRate != 0)
 	{
 		_sampleRateIndex = validSampleRates.indexOf(newSampleRate);
 		return newSampleRate;
@@ -115,6 +112,10 @@ bool Scope::setPoints(POINTS newPoints)
 {
 	int oldPoints = _points;
 	_points = newPoints;
+	if(newPoints >= POINTS_8192)
+		writeCmd(":TIMEBASE:RANGE 10e-9");
+	else
+		writeCmd(":TIMEBASE:RANGE 1");
 	writeCmd(QString(":ACQUIRE:POINTS "), newPoints);
 	updateTimebaseRange();
 

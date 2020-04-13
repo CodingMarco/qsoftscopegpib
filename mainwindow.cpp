@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QtMath>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent),
@@ -34,8 +35,11 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->comboBoxPoints, SIGNAL(currentIndexChanged(QString)), &scope, SLOT(setPoints(QString)));
 
 	// Scope thread stuff
-	connect(&scope, SIGNAL(waveformUpdated(WaveformPointsVector)), this, SLOT(plotWaveform(WaveformPointsVector)));
 	connect(&scopeThread, SIGNAL(started()), &scope, SLOT(initializeThreadRelatedStuff()));
+
+	// Waveform plot
+	connect(&scope, SIGNAL(waveformUpdated(WaveformPointsVector)), this, SLOT(plotWaveform(WaveformPointsVector)));
+	connect(ui->qwtPlot, &WaveformPlot::mouseScrolled, this, &MainWindow::zoom);
 
 	scopeThread.start();
 
@@ -43,10 +47,10 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurve->setStyle(QwtPlotCurve::Lines);
 	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
 	waveformCurve->attach(ui->qwtPlot);
-	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, true);
+	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, false);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
-	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1, 0.3);
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.02, 0.02);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;
@@ -65,7 +69,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-	scope.stopWaveformUpdate();
+	QMetaObject::invokeMethod(&scope, "stopWaveformUpdate", Qt::BlockingQueuedConnection);
 	scope.closeInstrument();
 	scopeThread.quit();
 	event->accept();
@@ -79,6 +83,7 @@ bool MainWindow::autoconnect()
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
 	scope.setTimebaseReference(CENTER);
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
+	timebaseRange = scope.maximumTimebaseRange();
 	return true;
 }
 
@@ -123,11 +128,9 @@ void MainWindow::on_cmdSend_clicked()
 		QMessageBox::information(this, "Not connected", "Error: Scope not connected!");
 }
 
-void MainWindow::updateTimebaseRange(double range)
+void MainWindow::setTimebaseRange(double range)
 {
-	ui->lblTimebaseRangeNumber->setText(QString::number(range, 'e', 0));
-	// Compensate number of points. On scope screen, always 500 points are displayed. We want to display them all.
-	range *= (scope.points() / 512);
+	ui->lblTimebaseRangeNumber->setText(QString::number(range));
 	switch(scope.timebaseReference()) {
 		case LEFT:
 			ui->qwtPlot->setAxisScale(QwtPlot::xBottom, 0, range);
@@ -139,6 +142,7 @@ void MainWindow::updateTimebaseRange(double range)
 			ui->qwtPlot->setAxisScale(QwtPlot::xBottom, -range, 0);
 			break;
 	}
+	ui->qwtPlot->replot();
 }
 
 void MainWindow::on_comboBoxReference_currentIndexChanged(int reference_mode)
@@ -150,4 +154,20 @@ void MainWindow::on_comboBoxReference_currentIndexChanged(int reference_mode)
 	else
 		ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, false);
 	//updateTimebaseRange(scope.timebaseRange());
+}
+
+void MainWindow::on_cmdStop_clicked()
+{
+	if(!scope.waveformUpdateActive())
+		QMetaObject::invokeMethod(&scope, "singleWaveformUpdate");
+}
+
+void MainWindow::zoom(int amount)
+{
+	double absAmount = abs(amount);
+	if(amount > 0)
+		timebaseRange *= (absAmount * 1.2);
+	else
+		timebaseRange *= (absAmount * 0.8);
+	setTimebaseRange(timebaseRange);
 }

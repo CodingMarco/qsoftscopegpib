@@ -23,6 +23,7 @@ private:
 	Scope scope;
 	QThread scopeThread;
 	QwtPlotCurve* waveformCurve = nullptr;
+	double timebaseRange = 0;
 
 	void closeEvent(QCloseEvent* event);
 	bool autoconnect();
@@ -33,6 +34,8 @@ private slots:
 	void on_actionInfo_triggered();
 	void on_cmdQuery_clicked();
 	void on_cmdSend_clicked();
-	void updateTimebaseRange(double range);
+	void setTimebaseRange(double range);
 	void on_comboBoxReference_currentIndexChanged(int reference_mode);
+	void on_cmdStop_clicked();
+	void zoom(int amount);
 };

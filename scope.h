@@ -18,7 +18,7 @@ private:
 	int _bytesPerPoint = -1;
 	int _sampleRateIndex = -1;
 	double _timebaseRange = -1;
-	bool doWaveformUpdates = false;
+	bool _waveformUpdateActive = false;
 	QVector<double> _channelsRange;
 	POINTS _points = POINTS(-1);
 	WAVEFORM_FORMAT _format;
@@ -50,9 +50,12 @@ public:
 	// Get parameters
 	POINTS points() { return this->_points; }
 	QString idn() { return query("*IDN?"); }
-	double timebaseRange() { return this->_points / validSampleRates[_sampleRateIndex]; }
+
+	double maximumTimebaseRange() { return double(this->_points) / validSampleRates[_sampleRateIndex]; }
+
 	double channelRange(int channel) { return _channelsRange[channel]; }
 	TIMEBASE_REFERENCE timebaseReference() { return _timebaseReference; }
+	bool waveformUpdateActive() { return _waveformUpdateActive; }
 
 public slots:
 	// Set parameters
@@ -67,8 +70,8 @@ public slots:
 
 	// Misc
 	void autoscale();
-	void startWaveformUpdate() { waveformUpdateTimer->start(); }
-	void stopWaveformUpdate()  { waveformUpdateTimer->stop();  }
+	void startWaveformUpdate() { waveformUpdateTimer->start(); _waveformUpdateActive = true;  }
+	void stopWaveformUpdate()  { waveformUpdateTimer->stop();  _waveformUpdateActive = false; }
 	void singleWaveformUpdate();
 	void initializeThreadRelatedStuff();
 
