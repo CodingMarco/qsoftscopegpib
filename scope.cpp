@@ -14,6 +14,19 @@ Scope::Scope()
 {
 }
 
+double Scope::nextLowerTimebaseRange()
+{
+	if(_sampleRateIndex == 0)
+		return maximumTimebaseRange();
+	else
+		return double(this->_points) / validSampleRates[_sampleRateIndex-1];
+}
+
+double Scope::maximumTimebaseRange()
+{
+	return double(this->_points) / validSampleRates[_sampleRateIndex];
+}
+
 QVector<ushort> Scope::getWaveformData()
 {
 	writeCmd(":WAVEFORM:DATA?");
@@ -63,8 +76,9 @@ int Scope::updateSampleRate()
 	}
 	else
 	{
-		qCritical() << "[CRITICAL]: Sample rate could not be parsed!";
-		return -1;
+		qCritical() << "[CRITICAL]: Sample rate could not be parsed! Setting it to 1MSa/s.";
+		setSampleRateByIndex(10);
+		return validSampleRates[10];
 	}
 }
 
@@ -72,8 +86,8 @@ bool Scope::setSampleRateByIndex(int m_sampleRateIndex)
 {
 	if(m_sampleRateIndex >= 0 && m_sampleRateIndex < validSampleRates.size())
 	{
-		writeCmd(QString(":TIMEBASE:SAMPLE:CLOCK ") + QString::number(validSampleRates[m_sampleRateIndex]));
 		_sampleRateIndex = m_sampleRateIndex;
+		writeCmd(QString(":TIMEBASE:SAMPLE:CLOCK ") + QString::number(validSampleRates[m_sampleRateIndex]));
 		return true;
 	}
 	else
@@ -112,10 +126,6 @@ bool Scope::setPoints(POINTS newPoints)
 {
 	int oldPoints = _points;
 	_points = newPoints;
-	if(newPoints >= POINTS_8192)
-		writeCmd(":TIMEBASE:RANGE 10e-9");
-	else
-		writeCmd(":TIMEBASE:RANGE 1");
 	writeCmd(QString(":ACQUIRE:POINTS "), newPoints);
 	updateTimebaseRange();
 
@@ -213,7 +223,29 @@ bool Scope::zoomOut()
 void Scope::initializeThreadRelatedStuff()
 {
 	waveformUpdateTimer = new QTimer(this);
-	connect(waveformUpdateTimer, SIGNAL(timeout()), this, SLOT(digitizeAndGetPoints()));
+	connect(waveformUpdateTimer, &QTimer::timeout, this, &Scope::digitizeAndGetPoints);
+}
+
+void Scope::toggleAcCouplingAndLfReject(bool toggle)
+{
+	if(toggle)
+	{
+		writeCmd(":CHANNEL1:COUPLING AC");
+		writeCmd(":CHANNEL1:LFREJECT ON");
+	}
+	else
+	{
+		writeCmd(":CHANNEL1:COUPLING DC");
+		writeCmd(":CHANNEL1:LFREJECT OFF");
+	}
+}
+
+void Scope::autoAdjustSampleRate(double newTimebaseRange)
+{
+	if(newTimebaseRange < nextLowerTimebaseRange())
+		zoomIn();
+	else if(newTimebaseRange > maximumTimebaseRange())
+		zoomOut();
 }
 
 QMap<QString, double> Scope::getWaveformPreamble()

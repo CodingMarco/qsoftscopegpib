@@ -3,8 +3,8 @@
 #include "scopeNamespace.h"
 #include "connectdialog.h"
 #include "customAxisScaleDraw.h"
+#include "commonFunctions.h"
 
-#include <unistd.h>
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_plot_curve.h>
 #include <qwt/qwt_scale_engine.h>
@@ -14,7 +14,6 @@
 #include <QVector>
 #include <QTimer>
 #include <QMessageBox>
-#include <QtConcurrent/QtConcurrentRun>
 #include <QtMath>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -47,10 +46,10 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurve->setStyle(QwtPlotCurve::Lines);
 	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
 	waveformCurve->attach(ui->qwtPlot);
-	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, false);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
-	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.02, 0.02);
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1.5, 0.5);
+	//ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.03, 0.03);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;
@@ -82,6 +81,7 @@ bool MainWindow::autoconnect()
 	scope.setPoints(POINTS_512);
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
 	scope.setTimebaseReference(CENTER);
+	scope.writeCmd(":DISPLAY:SCREEN OFF");
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	timebaseRange = scope.maximumTimebaseRange();
 	return true;
@@ -130,7 +130,9 @@ void MainWindow::on_cmdSend_clicked()
 
 void MainWindow::setTimebaseRange(double range)
 {
-	ui->lblTimebaseRangeNumber->setText(QString::number(range));
+	timebaseRange = range;
+	ui->lblTimebaseRangeNumber->setText(CommonFunctions::toSiValue(range, "s"));
+
 	switch(scope.timebaseReference()) {
 		case LEFT:
 			ui->qwtPlot->setAxisScale(QwtPlot::xBottom, 0, range);
@@ -165,9 +167,27 @@ void MainWindow::on_cmdStop_clicked()
 void MainWindow::zoom(int amount)
 {
 	double absAmount = abs(amount);
-	if(amount > 0)
-		timebaseRange *= (absAmount * 1.2);
+	double newTimebaseRange = 0;
+	if(amount < 0)
+		newTimebaseRange = timebaseRange * absAmount * 1.1;
 	else
-		timebaseRange *= (absAmount * 0.8);
-	setTimebaseRange(timebaseRange);
+		newTimebaseRange = timebaseRange * absAmount * 0.9;
+
+	setTimebaseRange(newTimebaseRange);
+
+	QMetaObject::invokeMethod(&scope, "autoAdjustSampleRate", Q_ARG(double, newTimebaseRange));
+}
+
+void MainWindow::on_checkBoxACLF_stateChanged()
+{
+	if(ui->checkBoxACLF->isChecked())
+	{
+		ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.03, 0.03);
+		QMetaObject::invokeMethod(&scope, "toggleAcCouplingAndLfReject", Q_ARG(bool, true));
+	}
+	else
+	{
+		ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1.5, 0.5);
+		QMetaObject::invokeMethod(&scope, "toggleAcCouplingAndLfReject", Q_ARG(bool, false));
+	}
 }

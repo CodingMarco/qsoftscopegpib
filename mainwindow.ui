@@ -86,7 +86,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tabGeneral">
         <attribute name="title">
@@ -254,6 +254,20 @@
         <attribute name="title">
          <string>Channels</string>
         </attribute>
+        <widget class="QCheckBox" name="checkBoxACLF">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>50</y>
+           <width>111</width>
+           <height>51</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>AC Coupling
++ LF-Reject</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </widget>

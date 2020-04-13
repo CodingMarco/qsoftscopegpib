@@ -51,7 +51,8 @@ public:
 	POINTS points() { return this->_points; }
 	QString idn() { return query("*IDN?"); }
 
-	double maximumTimebaseRange() { return double(this->_points) / validSampleRates[_sampleRateIndex]; }
+	double nextLowerTimebaseRange();
+	double maximumTimebaseRange();
 
 	double channelRange(int channel) { return _channelsRange[channel]; }
 	TIMEBASE_REFERENCE timebaseReference() { return _timebaseReference; }
@@ -74,6 +75,8 @@ public slots:
 	void stopWaveformUpdate()  { waveformUpdateTimer->stop();  _waveformUpdateActive = false; }
 	void singleWaveformUpdate();
 	void initializeThreadRelatedStuff();
+	void toggleAcCouplingAndLfReject(bool toggle);
+	void autoAdjustSampleRate(double newTimebaseRange);
 
 private slots:
 	void digitizeAndGetPoints();

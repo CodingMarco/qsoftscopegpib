@@ -38,4 +38,5 @@ private slots:
 	void on_comboBoxReference_currentIndexChanged(int reference_mode);
 	void on_cmdStop_clicked();
 	void zoom(int amount);
+	void on_checkBoxACLF_stateChanged();
 };
