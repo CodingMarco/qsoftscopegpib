@@ -26,8 +26,6 @@ MainWindow::MainWindow(QWidget *parent)
 	// Buttons and other controls
 	connect(ui->cmdStart, &QPushButton::clicked, &scope, &Scope::startWaveformUpdate);
 	connect(ui->cmdStop, &QPushButton::clicked, &scope, &Scope::stopWaveformUpdate);
-	connect(ui->cmdZoomIn, &QPushButton::clicked, &scope, &Scope::zoomIn);
-	connect(ui->cmdZoomOut, &QPushButton::clicked, &scope, &Scope::zoomOut);
 	connect(ui->cmdAutoscale, &QPushButton::clicked, &scope, &Scope::autoscale);
 	connect(ui->comboBoxPoints, SIGNAL(currentIndexChanged(QString)), &scope, SLOT(setPoints(QString)));
 
@@ -75,11 +73,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 bool MainWindow::autoconnect()
 {
 	scope.openInstrument(7);
-	scope.setFormat(WAVEFORM_FORMAT_WORD);
-	scope.setPoints(POINTS_1024);
-	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
-	scope.setTimebaseReference(CENTER);
-	scope.writeCmd(":DISPLAY:SCREEN OFF");
+	scope.initializeScope();
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	timebaseRange = scope.nextLowerTimebaseRange();
 	return true;
@@ -187,4 +181,16 @@ void MainWindow::on_checkBoxACLF_stateChanged()
 		ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1.5, 0.5);
 		QMetaObject::invokeMethod(&scope, "toggleAcCouplingAndLfReject", Q_ARG(bool, false));
 	}
+}
+
+void MainWindow::on_cmdZoomIn_clicked()
+{
+	QMetaObject::invokeMethod(&scope, "zoomIn", Qt::BlockingQueuedConnection);
+	setTimebaseRange(scope.maximumTimebaseRange());
+}
+
+void MainWindow::on_cmdZoomOut_clicked()
+{
+	QMetaObject::invokeMethod(&scope, "zoomOut", Qt::BlockingQueuedConnection);
+	setTimebaseRange(scope.maximumTimebaseRange());
 }

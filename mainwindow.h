@@ -39,4 +39,6 @@ private slots:
 	void on_cmdStop_clicked();
 	void zoom(int amount);
 	void on_checkBoxACLF_stateChanged();
+	void on_cmdZoomIn_clicked();
+	void on_cmdZoomOut_clicked();
 };

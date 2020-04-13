@@ -68,6 +68,7 @@ public slots:
 	bool zoomOut();
 
 	// Misc
+	void initializeScope();
 	void autoscale();
 	void startWaveformUpdate() { waveformUpdateTimer->start(); _waveformUpdateActive = true;  }
 	void stopWaveformUpdate()  { waveformUpdateTimer->stop();  _waveformUpdateActive = false; }

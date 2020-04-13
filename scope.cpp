@@ -16,7 +16,7 @@ Scope::Scope()
 
 double Scope::nextLowerTimebaseRange()
 {
-	if(_sampleRateIndex == 0)
+	if(_sampleRateIndex <= 0)
 		return maximumTimebaseRange();
 	else
 		return double(this->_points) / validSampleRates[_sampleRateIndex-1];
@@ -207,6 +207,17 @@ bool Scope::zoomOut()
 		return setSampleRateByIndex(_sampleRateIndex+1);
 	else // This is a normal condition, maximum zoom out is reached.
 		return false;
+}
+
+void Scope::initializeScope()
+{
+	writeCmd(":DISPLAY:SCREEN OFF");
+	writeCmd(":DISPLAY:CONNECT OFF");
+	setFormat(WAVEFORM_FORMAT_WORD);
+	setPoints(POINTS_1024);
+	setAcquireType(ACQUIRE_TYPE_NORMAL);
+	setTimebaseReference(CENTER);
+	updateSampleRate();
 }
 
 void Scope::initializeThreadRelatedStuff()
