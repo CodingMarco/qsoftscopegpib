@@ -43,14 +43,6 @@ QVector<ushort> Scope::getWaveformData()
 	return samples;
 }
 
-double Scope::updateTimebaseRange()
-{
-	updateSampleRate();
-	this->_timebaseRange = this->_points / this->validSampleRates[_sampleRateIndex];
-	emit timebaseRangeUpdated(this->_timebaseRange);
-	return this->_timebaseRange;
-}
-
 int Scope::updateSampleRate()
 {
 	QString sampleRateWithSi = query(":TIMEBASE:SAMPLE:CLOCK?").remove("Sa/s");
@@ -99,8 +91,6 @@ bool Scope::setSampleRateByIndex(int m_sampleRateIndex)
 
 void Scope::digitizeAndGetPoints()
 {
-	if(_timebaseRange == -1)
-		updateTimebaseRange();
 	digitize();
 	auto preamble = getWaveformPreamble();
 	writeCmd(":WAVEFORM:DATA?");
@@ -127,7 +117,6 @@ bool Scope::setPoints(POINTS newPoints)
 	int oldPoints = _points;
 	_points = newPoints;
 	writeCmd(QString(":ACQUIRE:POINTS "), newPoints);
-	updateTimebaseRange();
 
 	if(oldPoints != -1)
 	{

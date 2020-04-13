@@ -17,7 +17,6 @@ private:
 	int _sourceChannel = 1;
 	int _bytesPerPoint = -1;
 	int _sampleRateIndex = -1;
-	double _timebaseRange = -1;
 	bool _waveformUpdateActive = false;
 	QVector<double> _channelsRange;
 	POINTS _points = POINTS(-1);
@@ -37,7 +36,6 @@ private:
 	// Read parameters and data from oscilloscope
 	QMap<QString, double> getWaveformPreamble();
 	QVector<ushort> getWaveformData();
-	double updateTimebaseRange();
 	int updateSampleRate();
 
 	// Set horizontal and vertical parameters
@@ -82,6 +80,5 @@ private slots:
 	void digitizeAndGetPoints();
 
 signals:
-	void timebaseRangeUpdated(double m_timebaseRange);
 	void waveformUpdated(WaveformPointsVector);
 };

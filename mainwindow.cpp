@@ -23,8 +23,6 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->setupUi(this);
 	scope.moveToThread(&scopeThread);
 
-	//connect(&scope, SIGNAL(timebaseRangeUpdated(double)), this, SLOT(updateTimebaseRange(double)));
-
 	// Buttons and other controls
 	connect(ui->cmdStart, &QPushButton::clicked, &scope, &Scope::startWaveformUpdate);
 	connect(ui->cmdStop, &QPushButton::clicked, &scope, &Scope::stopWaveformUpdate);
@@ -78,12 +76,12 @@ bool MainWindow::autoconnect()
 {
 	scope.openInstrument(7);
 	scope.setFormat(WAVEFORM_FORMAT_WORD);
-	scope.setPoints(POINTS_512);
+	scope.setPoints(POINTS_1024);
 	scope.setAcquireType(ACQUIRE_TYPE_NORMAL);
 	scope.setTimebaseReference(CENTER);
 	scope.writeCmd(":DISPLAY:SCREEN OFF");
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
-	timebaseRange = scope.maximumTimebaseRange();
+	timebaseRange = scope.nextLowerTimebaseRange();
 	return true;
 }
 
@@ -155,7 +153,6 @@ void MainWindow::on_comboBoxReference_currentIndexChanged(int reference_mode)
 		ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	else
 		ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, false);
-	//updateTimebaseRange(scope.timebaseRange());
 }
 
 void MainWindow::on_cmdStop_clicked()
