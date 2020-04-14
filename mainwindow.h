@@ -24,6 +24,8 @@ private:
 	QThread scopeThread;
 	QwtPlotCurve* waveformCurve = nullptr;
 	double timebaseRange = 0;
+	double channelRange = 0;
+	double channelOffset = 0;
 
 	void closeEvent(QCloseEvent* event);
 	bool autoconnect();
@@ -37,7 +39,9 @@ private slots:
 	void setTimebaseRange(double range);
 	void on_comboBoxReference_currentIndexChanged(int reference_mode);
 	void on_cmdStop_clicked();
-	void zoom(int amount);
+	void zoomTimebase(int amount);
+	void zoomVertical(int amount);
+	void updateChannelRange();
 	void on_checkBoxACLF_stateChanged();
 	void on_cmdZoomIn_clicked();
 	void on_cmdZoomOut_clicked();

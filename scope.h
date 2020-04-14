@@ -67,6 +67,10 @@ public slots:
 	bool zoomIn();
 	bool zoomOut();
 
+	// Get parameters
+	double getChannelRange();
+	double getChannelOffset();
+
 	// Misc
 	void initializeScope();
 	void autoscale();

@@ -1,4 +1,5 @@
 #include "waveformPlot.h"
+#include <QGuiApplication>
 
 WaveformPlot::WaveformPlot(QWidget *parent)
 {
@@ -7,5 +8,8 @@ WaveformPlot::WaveformPlot(QWidget *parent)
 
 void WaveformPlot::wheelEvent(QWheelEvent *event)
 {
-	emit mouseScrolled(event->angleDelta().y()/120);
+	if(QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
+		emit mouseWithShiftScrolled(event->angleDelta().y()/120);
+	else
+		emit mouseScrolled(event->angleDelta().y()/120);
 }

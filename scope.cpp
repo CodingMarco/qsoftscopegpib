@@ -209,6 +209,16 @@ bool Scope::zoomOut()
 		return false;
 }
 
+double Scope::getChannelRange()
+{
+	return query(":CHANNEL1:RANGE?").toDouble();
+}
+
+double Scope::getChannelOffset()
+{
+	return query(":CHANNEL1:OFFSET?").toDouble();
+}
+
 void Scope::initializeScope()
 {
 	writeCmd(":DISPLAY:SCREEN OFF");
@@ -263,7 +273,7 @@ QMap<QString, double> Scope::getWaveformPreamble()
 
 void Scope::autoscale()
 {
-	writeCmd(":autoscale");
+	writeCmd(":AUTOSCALE");
 	setPoints(_points);
 	setTimebaseReference(_timebaseReference);
 }

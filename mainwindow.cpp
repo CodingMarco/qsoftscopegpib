@@ -34,7 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 	// Waveform plot
 	connect(&scope, SIGNAL(waveformUpdated(WaveformPointsVector)), this, SLOT(plotWaveform(WaveformPointsVector)));
-	connect(ui->qwtPlot, &WaveformPlot::mouseScrolled, this, &MainWindow::zoom);
+	connect(ui->qwtPlot, &WaveformPlot::mouseScrolled, this, &MainWindow::zoomTimebase);
+	connect(ui->qwtPlot, &WaveformPlot::mouseWithShiftScrolled, this, &MainWindow::zoomVertical);
 
 	scopeThread.start();
 
@@ -44,8 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurve->attach(ui->qwtPlot);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
-	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1.5, 0.5);
-	//ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -0.03, 0.03);
+	//ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1.5, 0.5);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;
@@ -76,6 +76,9 @@ bool MainWindow::autoconnect()
 	scope.initializeScope();
 	ui->qwtPlot->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Symmetric, true);
 	timebaseRange = scope.nextLowerTimebaseRange();
+	QMetaObject::invokeMethod(&scope, "getChannelRange", Qt::BlockingQueuedConnection, Q_RETURN_ARG(double, channelRange));
+	QMetaObject::invokeMethod(&scope, "getChannelOffset", Qt::BlockingQueuedConnection, Q_RETURN_ARG(double, channelOffset));
+	updateChannelRange();
 	return true;
 }
 
@@ -155,7 +158,7 @@ void MainWindow::on_cmdStop_clicked()
 		QMetaObject::invokeMethod(&scope, "singleWaveformUpdate");
 }
 
-void MainWindow::zoom(int amount)
+void MainWindow::zoomTimebase(int amount)
 {
 	double absAmount = abs(amount);
 	double newTimebaseRange = 0;
@@ -167,6 +170,21 @@ void MainWindow::zoom(int amount)
 	setTimebaseRange(newTimebaseRange);
 
 	QMetaObject::invokeMethod(&scope, "autoAdjustSampleRate", Q_ARG(double, newTimebaseRange));
+}
+
+void MainWindow::zoomVertical(int amount)
+{
+	double absAmount = abs(amount);
+	if(amount < 0)
+		channelRange *= absAmount * 1.1;
+	else
+		channelRange *= absAmount * 0.9;
+	updateChannelRange();
+}
+
+void MainWindow::updateChannelRange()
+{
+	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -channelRange/2+channelOffset, channelRange/2+channelOffset);
 }
 
 void MainWindow::on_checkBoxACLF_stateChanged()

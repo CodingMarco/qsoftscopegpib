@@ -16,4 +16,5 @@ protected:
 
 signals:
 	void mouseScrolled(int amount);
+	void mouseWithShiftScrolled(int amount);
 };
