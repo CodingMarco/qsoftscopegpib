@@ -36,10 +36,9 @@ private:
 	// Read parameters and data from oscilloscope
 	QMap<QString, double> getWaveformPreamble();
 	QVector<ushort> getWaveformData();
-	int updateSampleRate();
+	int updateSampleRateFromScope();
 
 	// Set horizontal and vertical parameters
-	bool setTimebaseRange(double range);
 	bool setSampleRateByIndex(int m_sampleRate);
 
 public:
@@ -48,9 +47,6 @@ public:
 	// Get parameters
 	POINTS points() { return this->_points; }
 	QString idn() { return query("*IDN?"); }
-
-	double nextLowerTimebaseRange();
-	double maximumTimebaseRange();
 
 	double channelRange(int channel) { return _channelsRange[channel]; }
 	TIMEBASE_REFERENCE timebaseReference() { return _timebaseReference; }
@@ -64,12 +60,14 @@ public slots:
 	bool setSourceChannel(int m_channel);
 	bool setAcquireType(ACQUIRE_TYPE m_type);
 	void setTimebaseReference(TIMEBASE_REFERENCE m_reference);
-	bool zoomIn();
-	bool zoomOut();
+	void zoomIn(bool emitSignal = true);
+	void zoomOut(bool emitSignal = true);
 
 	// Get parameters
 	double getChannelRange();
 	double getChannelOffset();
+	double nextLowerTimebaseRange();
+	double optimalTimebaseRange();
 
 	// Misc
 	void initializeScope();
@@ -80,10 +78,13 @@ public slots:
 	void initializeThreadRelatedStuff();
 	void toggleAcCouplingAndLfReject(bool toggle);
 	void autoAdjustSampleRate(double newTimebaseRange);
+	void autoAdjustChannelRange(double oldChannelRange, double newChannelRange);
 
 private slots:
 	void digitizeAndGetPoints();
 
 signals:
 	void waveformUpdated(WaveformPointsVector);
+	void autoscaleComplete(XYSettings autoscaleResult);
+	void zoomed(double newOptimalTimebaseRange);
 };

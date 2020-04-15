@@ -27,6 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->cmdStart, &QPushButton::clicked, &scope, &Scope::startWaveformUpdate);
 	connect(ui->cmdStop, &QPushButton::clicked, &scope, &Scope::stopWaveformUpdate);
 	connect(ui->cmdAutoscale, &QPushButton::clicked, &scope, &Scope::autoscale);
+	connect(ui->cmdZoomIn, SIGNAL(clicked()), &scope, SLOT(zoomIn()));
+	connect(ui->cmdZoomOut, SIGNAL(clicked()), &scope, SLOT(zoomOut()));
+	connect(&scope, &Scope::zoomed, this, &MainWindow::setTimebaseRange);
+	connect(&scope, &Scope::autoscaleComplete, this, &MainWindow::adjustXYAfterAutoscale);
 	connect(ui->comboBoxPoints, SIGNAL(currentIndexChanged(QString)), &scope, SLOT(setPoints(QString)));
 
 	// Scope thread stuff
@@ -45,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurve->attach(ui->qwtPlot);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
-	//ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -1.5, 0.5);
 
 	// Grid
 	QwtPlotGrid *grid = new QwtPlotGrid;
@@ -53,6 +56,16 @@ MainWindow::MainWindow(QWidget *parent)
 	grid->setMajorPen(QPen(QColor(255, 255, 255, 100), 0, Qt::DotLine));
 	grid->setMinorPen(QPen(QColor(100, 100, 100, 100), 0, Qt::DotLine));
 	grid->attach(ui->qwtPlot);
+
+	// Panner (move curve with mouse)
+	panner = new QwtPlotPanner(ui->qwtPlot->canvas());
+	panner->setMouseButton(Qt::LeftButton);
+
+	// Marker
+//	marker = new QwtPlotMarker("X1");
+//	marker->setLineStyle(QwtPlotMarker::VLine);
+//	marker->setLinePen(QColor::fromRgb(100,100,255), 2);
+//	marker->attach(ui->qwtPlot);
 
 	autoconnect();
 }
@@ -163,8 +176,8 @@ void MainWindow::zoomTimebase(int amount)
 	double absAmount = abs(amount);
 	double newTimebaseRange = 0;
 	if(amount < 0)
-		newTimebaseRange = timebaseRange * absAmount * 1.1;
-	else
+		newTimebaseRange = timebaseRange * absAmount * 1.05;
+	else if(amount > 0)
 		newTimebaseRange = timebaseRange * absAmount * 0.9;
 
 	setTimebaseRange(newTimebaseRange);
@@ -174,17 +187,21 @@ void MainWindow::zoomTimebase(int amount)
 
 void MainWindow::zoomVertical(int amount)
 {
+	double oldChannelRange = channelRange;
 	double absAmount = abs(amount);
 	if(amount < 0)
 		channelRange *= absAmount * 1.1;
 	else
 		channelRange *= absAmount * 0.9;
+	QMetaObject::invokeMethod(&scope, "autoAdjustChannelRange",
+							  Q_ARG(double, oldChannelRange), Q_ARG(double, channelRange));
 	updateChannelRange();
 }
 
 void MainWindow::updateChannelRange()
 {
 	ui->qwtPlot->setAxisScale(QwtPlot::yLeft, -channelRange/2+channelOffset, channelRange/2+channelOffset);
+	ui->qwtPlot->replot();
 }
 
 void MainWindow::on_checkBoxACLF_stateChanged()
@@ -201,14 +218,10 @@ void MainWindow::on_checkBoxACLF_stateChanged()
 	}
 }
 
-void MainWindow::on_cmdZoomIn_clicked()
+void MainWindow::adjustXYAfterAutoscale(XYSettings autoscaleResult)
 {
-	QMetaObject::invokeMethod(&scope, "zoomIn", Qt::BlockingQueuedConnection);
-	setTimebaseRange(scope.maximumTimebaseRange());
-}
-
-void MainWindow::on_cmdZoomOut_clicked()
-{
-	QMetaObject::invokeMethod(&scope, "zoomOut", Qt::BlockingQueuedConnection);
-	setTimebaseRange(scope.maximumTimebaseRange());
+	setTimebaseRange(autoscaleResult.timebaseRange);
+	channelRange = autoscaleResult.channelRange;
+	channelOffset = autoscaleResult.channelOffset;
+	updateChannelRange();
 }

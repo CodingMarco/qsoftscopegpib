@@ -40,3 +40,11 @@ struct ScopeSettings
 	ACQUIRE_TYPE acquireType;
 	TIMEBASE_REFERENCE timebaseReference;
 };
+
+struct XYSettings
+{
+	double channelRange;
+	double channelOffset;
+	double timebaseRange;
+	double timebaseDelay;
+};

@@ -19,7 +19,7 @@ bool GpibInstrument::openInstrument(int addr)
 {
 	// Connect to scope at specified address
 	// /dev/gpib0, addr. 7, no second addr, 10s timeout, no EOI line, stop at EOS-Byte
-	this->instr = ibdev(0, addr, 0, T3s, 0, 0);
+	this->instr = ibdev(0, addr, 0, T10s, 0, 0);
 	if(this->instr == -1)
 	{
 		qCritical() << "Could not connect to GPIB-adapter";

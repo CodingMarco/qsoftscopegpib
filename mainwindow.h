@@ -2,6 +2,8 @@
 
 #include <QMainWindow>
 #include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_plot_panner.h>
+#include <qwt/qwt_plot_marker.h>
 #include <QCloseEvent>
 #include <QThread>
 #include "scope.h"
@@ -22,7 +24,9 @@ private:
 	Ui::MainWindow *ui;
 	Scope scope;
 	QThread scopeThread;
-	QwtPlotCurve* waveformCurve = nullptr;
+	QwtPlotCurve *waveformCurve = nullptr;
+	QwtPlotPanner *panner = nullptr;
+	QwtPlotMarker *marker = nullptr;
 	double timebaseRange = 0;
 	double channelRange = 0;
 	double channelOffset = 0;
@@ -43,6 +47,5 @@ private slots:
 	void zoomVertical(int amount);
 	void updateChannelRange();
 	void on_checkBoxACLF_stateChanged();
-	void on_cmdZoomIn_clicked();
-	void on_cmdZoomOut_clicked();
+	void adjustXYAfterAutoscale(XYSettings autoscaleResult);
 };

@@ -17,12 +17,12 @@ Scope::Scope()
 double Scope::nextLowerTimebaseRange()
 {
 	if(_sampleRateIndex <= 0)
-		return maximumTimebaseRange();
+		return optimalTimebaseRange();
 	else
 		return double(this->_points) / validSampleRates[_sampleRateIndex-1];
 }
 
-double Scope::maximumTimebaseRange()
+double Scope::optimalTimebaseRange()
 {
 	return double(this->_points) / validSampleRates[_sampleRateIndex];
 }
@@ -43,16 +43,19 @@ QVector<ushort> Scope::getWaveformData()
 	return samples;
 }
 
-int Scope::updateSampleRate()
+int Scope::updateSampleRateFromScope()
 {
 	QString sampleRateWithSi = query(":TIMEBASE:SAMPLE:CLOCK?").remove("Sa/s");
 	int newSampleRate = 0;
 	if(sampleRateWithSi.contains("AUTO"))
 	{
-		setSampleRateByIndex(10); // 1 MSa/s
-		newSampleRate = 1e6;
+		writeCmd(":MENU TIMEBASE");
+		writeCmd(":SYSTEM:KEY 16");
+		sampleRateWithSi = query(":TIMEBASE:SAMPLE:CLOCK?").remove("Sa/s");
+		//setSampleRateByIndex(10); // 1 MSa/s
+		//newSampleRate = 1e6;
 	}
-	else if(sampleRateWithSi.endsWith(' '))
+	if(sampleRateWithSi.endsWith(' '))
 		newSampleRate = sampleRateWithSi.remove(' ').toInt();
 	else if(sampleRateWithSi.endsWith(" k"))
 		newSampleRate = sampleRateWithSi.remove(" k").toInt() * 1e3;
@@ -193,20 +196,26 @@ void Scope::setTimebaseReference(TIMEBASE_REFERENCE m_reference)
 	}
 }
 
-bool Scope::zoomIn()
+void Scope::zoomIn(bool emitSignal)
 {
+	// If not, maximum zoom in is reached.
 	if(_sampleRateIndex > 0)
-		return setSampleRateByIndex(_sampleRateIndex-1);
-	else // This is a normal condition, maximum zoom in is reached.
-		return false;
+	{
+		setSampleRateByIndex(_sampleRateIndex-1);
+		if(emitSignal)
+			emit zoomed(optimalTimebaseRange());
+	}
 }
 
-bool Scope::zoomOut()
+void Scope::zoomOut(bool emitSignal)
 {
+	// If not, maximum zoom out is reached.
 	if(_sampleRateIndex < validSampleRates.size()-1)
-		return setSampleRateByIndex(_sampleRateIndex+1);
-	else // This is a normal condition, maximum zoom out is reached.
-		return false;
+	{
+		setSampleRateByIndex(_sampleRateIndex+1);
+		if(emitSignal)
+			emit zoomed(optimalTimebaseRange());
+	}
 }
 
 double Scope::getChannelRange()
@@ -227,7 +236,7 @@ void Scope::initializeScope()
 	setPoints(POINTS_1024);
 	setAcquireType(ACQUIRE_TYPE_NORMAL);
 	setTimebaseReference(CENTER);
-	updateSampleRate();
+	updateSampleRateFromScope();
 }
 
 void Scope::initializeThreadRelatedStuff()
@@ -253,9 +262,14 @@ void Scope::toggleAcCouplingAndLfReject(bool toggle)
 void Scope::autoAdjustSampleRate(double newTimebaseRange)
 {
 	if(newTimebaseRange < nextLowerTimebaseRange())
-		zoomIn();
-	else if(newTimebaseRange > maximumTimebaseRange())
-		zoomOut();
+		zoomIn(false);
+	else if(newTimebaseRange > optimalTimebaseRange())
+		zoomOut(false);
+}
+
+void Scope::autoAdjustChannelRange(double oldChannelRange, double newChannelRange)
+{
+	writeCmd(":CHANNEL1:RANGE " + QString::number(newChannelRange));
 }
 
 QMap<QString, double> Scope::getWaveformPreamble()
@@ -274,8 +288,15 @@ QMap<QString, double> Scope::getWaveformPreamble()
 void Scope::autoscale()
 {
 	writeCmd(":AUTOSCALE");
+	updateSampleRateFromScope();
 	setPoints(_points);
 	setTimebaseReference(_timebaseReference);
+	XYSettings autoscaleResult;
+	autoscaleResult.channelRange = getChannelRange();
+	autoscaleResult.channelOffset = getChannelOffset();
+	autoscaleResult.timebaseRange = optimalTimebaseRange();
+	autoscaleResult.timebaseDelay = 0;
+	emit autoscaleComplete(autoscaleResult);
 }
 
 void Scope::singleWaveformUpdate()
