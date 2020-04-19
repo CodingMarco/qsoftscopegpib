@@ -269,6 +269,19 @@ void Scope::setTriggerHoldoff(double holdoff)
 	writeCmd(":TRIGGER:HOLDOFF " + QString::number(holdoff));
 }
 
+void Scope::setTriggerSourceChannel(int channel)
+{
+	writeCmd(":TRIGGER:SOURCE CHANNEL" + QString::number(channel));
+}
+
+void Scope::enableTriggerNoiseReject(double enable)
+{
+	if(enable)
+		writeCmd(":TRIGGER:NREJECT ON");
+	else
+		writeCmd(":TRIGGER:NREJECT OFF");
+}
+
 QMap<QString, double> Scope::getWaveformPreamble()
 {
 	QMap<QString, double> preamble;

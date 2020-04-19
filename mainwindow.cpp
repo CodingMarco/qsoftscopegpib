@@ -297,3 +297,13 @@ void MainWindow::on_cmdTriggerHoldoffSet_clicked()
 		  Q_ARG(double, CommonFunctions::spinBoxAndComboBoxToVoltage(ui->spinBoxTriggerHoldoff->value(),
 																	 ui->comboBoxTriggerHoldoff->currentIndex())));
 }
+
+void MainWindow::on_comboBox_currentIndexChanged(const QString &channel)
+{
+	QMetaObject::invokeMethod(&scope, "setTriggerSourceChannel", Q_ARG(int, channel.toInt()));
+}
+
+void MainWindow::on_checkBoxNoiseReject_stateChanged(int checkState)
+{
+	QMetaObject::invokeMethod(&scope, "enableTriggerNoiseReject", Q_ARG(bool, checkState == Qt::Checked));
+}

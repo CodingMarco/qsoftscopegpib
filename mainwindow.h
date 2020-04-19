@@ -59,4 +59,6 @@ private slots:
 	void on_chkEnabledCh4_stateChanged(int checkState);
 	void on_cmdTriggerLevelSet_clicked();
 	void on_cmdTriggerHoldoffSet_clicked();
+	void on_comboBox_currentIndexChanged(const QString &channel);
+	void on_checkBoxNoiseReject_stateChanged(int checkState);
 };
