@@ -9,6 +9,8 @@
 #include <qwt/qwt_plot_curve.h>
 #include <qwt/qwt_scale_engine.h>
 #include <qwt/qwt_plot_grid.h>
+#include <qwt/qwt_curve_fitter.h>
+#include <qwt/qwt_spline.h>
 
 #include <QDebug>
 #include <QVector>
@@ -45,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	waveformCurve = new QwtPlotCurve("Waveform");
 	waveformCurve->setStyle(QwtPlotCurve::Lines);
-	waveformCurve->setPen(QColor::fromRgb(255,100,0), 1);
+	waveformCurve->setPen(QColor::fromRgb(255,100,255), 1);
 	waveformCurve->attach(ui->qwtPlot);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
