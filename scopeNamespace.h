@@ -40,6 +40,12 @@ enum COUPLING
 	AC
 };
 
+enum FUNCTION_OPERATOR
+{
+	MINUS,
+	PLUS
+};
+
 struct ScopeSettings
 {
 	POINTS points;

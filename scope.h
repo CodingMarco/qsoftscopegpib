@@ -80,6 +80,10 @@ public slots:
 	// Channels
 	void setChannelEnabled(int channel, bool enable);
 
+	// Trigger
+	void setTriggerLevel(double level);
+	void setTriggerHoldoff(double holdoff);
+
 private slots:
 	void digitizeAndGetPoints();
 

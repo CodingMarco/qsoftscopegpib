@@ -259,6 +259,16 @@ void Scope::setChannelEnabled(int channel, bool enable)
 	channels[channel-1].enabled = enable;
 }
 
+void Scope::setTriggerLevel(double level)
+{
+	writeCmd(":TRIGGER:LEVEL " + QString::number(level));
+}
+
+void Scope::setTriggerHoldoff(double holdoff)
+{
+	writeCmd(":TRIGGER:HOLDOFF " + QString::number(holdoff));
+}
+
 QMap<QString, double> Scope::getWaveformPreamble()
 {
 	QMap<QString, double> preamble;

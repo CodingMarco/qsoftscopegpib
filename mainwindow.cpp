@@ -47,6 +47,11 @@ MainWindow::MainWindow(QWidget *parent)
 	scopeThread.start();
 
 	// Initialize waveform curves
+	functionCurves.append(new QwtPlotCurve);
+	functionCurves.last()->setStyle(QwtPlotCurve::Lines);
+	functionCurves.last()->setPen(QColor::fromRgb(255,20,147), 1);
+	functionCurves.last()->attach(ui->qwtPlot);
+
 	for(int i = 0; i < 4; i++)
 	{
 		waveformCurves.append(new QwtPlotCurve);
@@ -118,10 +123,17 @@ void MainWindow::plotWaveforms(MultiChannelWaveformData waveformData)
 		fpsTimer.restart();
 	}
 
-	for(int i = 0; i < waveformData.size(); i++)
+	for(int i = 0; i < waveformCurves.size(); i++)
 	{
 		waveformCurves[i]->setSamples(waveformData[i]);
 	}
+
+	// Function: 1-2
+	if(ui->chkEnabledCh1->isChecked() && ui->chkEnabledCh2->isChecked())
+	{
+		functionCurves[0]->setSamples(CommonFunctions::getFunctionWaveform(waveformData[1-1], waveformData[2-1], MINUS));
+	}
+
 	ui->qwtPlot->replot();
 }
 
@@ -270,4 +282,18 @@ void MainWindow::on_chkEnabledCh3_stateChanged(int checkState)
 void MainWindow::on_chkEnabledCh4_stateChanged(int checkState)
 {
 	QMetaObject::invokeMethod(&scope, "setChannelEnabled", Q_ARG(int, 4), Q_ARG(bool, checkState == Qt::Checked));
+}
+
+void MainWindow::on_cmdTriggerLevelSet_clicked()
+{
+	QMetaObject::invokeMethod(&scope, "setTriggerLevel",
+		  Q_ARG(double, CommonFunctions::spinBoxAndComboBoxToVoltage(ui->spinBoxTriggerLevel->value(),
+																	 ui->comboBoxTriggerLevel->currentIndex())));
+}
+
+void MainWindow::on_cmdTriggerHoldoffSet_clicked()
+{
+	QMetaObject::invokeMethod(&scope, "setTriggerHoldoff",
+		  Q_ARG(double, CommonFunctions::spinBoxAndComboBoxToVoltage(ui->spinBoxTriggerHoldoff->value(),
+																	 ui->comboBoxTriggerHoldoff->currentIndex())));
 }

@@ -27,6 +27,7 @@ private:
 	Scope scope;
 	QThread scopeThread;
 	QVector<QwtPlotCurve*> waveformCurves;
+	QVector<QwtPlotCurve*> functionCurves;
 	QwtPlotPanner *panner = nullptr;
 	QwtPlotMarker *marker = nullptr;
 	QElapsedTimer fpsTimer;
@@ -56,4 +57,6 @@ private slots:
 	void on_chkEnabledCh2_stateChanged(int checkState);
 	void on_chkEnabledCh3_stateChanged(int checkState);
 	void on_chkEnabledCh4_stateChanged(int checkState);
+	void on_cmdTriggerLevelSet_clicked();
+	void on_cmdTriggerHoldoffSet_clicked();
 };
