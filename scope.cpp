@@ -12,12 +12,18 @@
 
 Scope::Scope()
 {
+	channels.resize(4);
 	channels[0].index = 1;
 	channels[0].active = true;
+
 	channels[1].index = 2;
 	channels[1].active = true;
+
 	channels[2].index = 3;
+	channels[2].active = false;
+
 	channels[3].index = 4;
+	channels[3].active = false;
 }
 
 double Scope::nextLowerTimebaseRange()
@@ -31,22 +37,6 @@ double Scope::nextLowerTimebaseRange()
 double Scope::optimalTimebaseRange()
 {
 	return double(this->_points) / validSampleRates[_sampleRateIndex];
-}
-
-QVector<ushort> Scope::getWaveformData()
-{
-	writeCmd(":WAVEFORM:DATA?");
-
-	QByteArray data = readAllByteData();
-
-	QVector<ushort> samples;
-	samples.reserve(data.size()/2);
-
-	for(int i = 0; i < data.size()/2; i++)
-	{
-		samples.append(qToBigEndian(*(((ushort*)data.data())+i)));
-	}
-	return samples;
 }
 
 int Scope::updateSampleRateFromScope()
@@ -100,20 +90,17 @@ bool Scope::setSampleRateByIndex(int m_sampleRateIndex)
 
 void Scope::digitizeAndGetPoints()
 {
-	digitize();
-	auto preamble = getWaveformPreamble();
-	writeCmd(":WAVEFORM:DATA?");
+	digitizeActiveChannels();
+	MultiChannelWaveformData multiChannelWaveformData;
+	multiChannelWaveformData.resize(channels.size());
 
-	QVector<ushort> yRawData = readAllWordData();
-	WaveformPointsVector pointData;
-	pointData.reserve(this->points());
-
-	for(int x = 0; x < this->points(); x++)
+	for(int i = 0; i < channels.size(); i++)
 	{
-		pointData.append({	(double(x)-preamble["xreference"]) * preamble["xincrement"] + preamble["xorigin"],
-							(double(yRawData[x])-preamble["yreference"]) * preamble["yincrement"] + preamble["yorigin"]	});
+		if(channels[i].active)
+			multiChannelWaveformData[i] = getPointsFromChannel(channels[i].index);
 	}
-	emit(waveformUpdated(pointData));
+
+	emit(waveformUpdated(multiChannelWaveformData));
 }
 
 bool Scope::setPoints(QString newPoints)
@@ -295,7 +282,7 @@ void Scope::singleWaveformUpdate()
 	digitizeAndGetPoints();
 }
 
-bool Scope::digitize()
+bool Scope::digitizeActiveChannels()
 {
 	QString digitizeCmd = ":DIGITIZE ";
 	for(Channel channel : channels)
@@ -305,4 +292,24 @@ bool Scope::digitize()
 	}
 	writeCmd(digitizeCmd);
 	return true;
+}
+
+WaveformPointsVector Scope::getPointsFromChannel(int channel)
+{
+	writeCmd(":WAVEFORM:SOURCE CHANNEL" + QString::number(channel));
+
+	auto preamble = getWaveformPreamble();
+	writeCmd(":WAVEFORM:DATA?");
+
+	QVector<ushort> yRawData = readAllWordData();
+	WaveformPointsVector pointData;
+	pointData.reserve(this->points());
+
+	for(int x = 0; x < this->points(); x++)
+	{
+		pointData.append({	(double(x)-preamble["xreference"]) * preamble["xincrement"] + preamble["xorigin"],
+							(double(yRawData[x])-preamble["yreference"]) * preamble["yincrement"] + preamble["yorigin"]	});
+	}
+
+	return pointData;
 }

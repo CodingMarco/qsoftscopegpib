@@ -35,7 +35,7 @@ private:
 	bool autoconnect();
 
 private slots:
-	void plotWaveform(WaveformPointsVector waveformData);
+	void plotWaveforms(MultiChannelWaveformData waveformData);
 	void on_actionConnect_triggered();
 	void on_actionInfo_triggered();
 	void on_cmdQuery_clicked();

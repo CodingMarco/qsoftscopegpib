@@ -17,7 +17,7 @@ private:
 	int _bytesPerPoint = -1;
 	int _sampleRateIndex = -1;
 	bool _waveformUpdateActive = false;
-	Channel channels[4];
+	QVector<Channel> channels;
 	POINTS _points = POINTS(-1);
 	WAVEFORM_FORMAT _format;
 	ACQUIRE_TYPE _acquireType;
@@ -30,11 +30,11 @@ private:
 	// Misc
 	QTimer *waveformUpdateTimer;
 	bool _printCommands = false;
-	bool digitize();
+	bool digitizeActiveChannels();
+	WaveformPointsVector getPointsFromChannel(int channel);
 
 	// Read parameters and data from oscilloscope
 	QMap<QString, double> getWaveformPreamble();
-	QVector<ushort> getWaveformData();
 	int updateSampleRateFromScope();
 
 	// Set horizontal and vertical parameters
@@ -81,7 +81,7 @@ private slots:
 	void digitizeAndGetPoints();
 
 signals:
-	void waveformUpdated(WaveformPointsVector);
+	void waveformUpdated(MultiChannelWaveformData);
 	void autoscaleComplete(XYSettings autoscaleResult);
 	void zoomed(double newOptimalTimebaseRange);
 };

@@ -6,6 +6,7 @@
 
 typedef unsigned char byte;
 typedef QVector<QPointF> WaveformPointsVector;
+typedef QVector<WaveformPointsVector> MultiChannelWaveformData;
 
 enum POINTS {
 	POINTS_512 = 512,

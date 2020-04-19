@@ -145,7 +145,7 @@ QByteArray GpibInstrument::readBytes(int bytesToRead)
 
 QByteArray GpibInstrument::readAllByteData()
 {
-	int bytesToRead = parseBlockData()+2;
+	int bytesToRead = parseBlockData();
 	return readBytes(bytesToRead);
 }
 

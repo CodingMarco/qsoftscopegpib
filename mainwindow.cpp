@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(&scopeThread, SIGNAL(started()), &scope, SLOT(initializeThreadRelatedStuff()));
 
 	// Waveform plot
-	connect(&scope, SIGNAL(waveformUpdated(WaveformPointsVector)), this, SLOT(plotWaveform(WaveformPointsVector)));
+	connect(&scope, SIGNAL(waveformUpdated(MultiChannelWaveformData)), this, SLOT(plotWaveforms(MultiChannelWaveformData)));
 	connect(ui->qwtPlot, &WaveformPlot::mouseScrolled, this, &MainWindow::zoomTimebase);
 	connect(ui->qwtPlot, &WaveformPlot::mouseWithShiftScrolled, this, &MainWindow::zoomVertical);
 
@@ -97,9 +97,9 @@ bool MainWindow::autoconnect()
 	return true;
 }
 
-void MainWindow::plotWaveform(WaveformPointsVector waveformData)
+void MainWindow::plotWaveforms(MultiChannelWaveformData waveformData)
 {
-	waveformCurve->setSamples(waveformData);
+	waveformCurve->setSamples(waveformData[0]);
 	ui->qwtPlot->replot();
 }
 
