@@ -33,6 +33,12 @@ enum TIMEBASE_REFERENCE {
 	RIGHT
 };
 
+enum COUPLING
+{
+	DC,
+	AC
+};
+
 struct ScopeSettings
 {
 	POINTS points;
@@ -47,4 +53,13 @@ struct XYSettings
 	double channelOffset;
 	double timebaseRange;
 	double timebaseDelay;
+};
+
+struct Channel
+{
+	int index = 0;
+	bool active = false;
+	COUPLING coupling = DC;
+	double offset = 0;
+	double range = 0;
 };

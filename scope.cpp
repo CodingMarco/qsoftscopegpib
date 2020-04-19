@@ -12,6 +12,12 @@
 
 Scope::Scope()
 {
+	channels[0].index = 1;
+	channels[0].active = true;
+	channels[1].index = 2;
+	channels[1].active = true;
+	channels[2].index = 3;
+	channels[3].index = 4;
 }
 
 double Scope::nextLowerTimebaseRange()
@@ -151,21 +157,6 @@ bool Scope::setFormat(WAVEFORM_FORMAT m_format)
 	return true;
 }
 
-bool Scope::setSourceChannel(int m_channel)
-{
-	if(m_channel > 4 || m_channel < 1)
-	{
-		qWarning() << "Channel must be 1, 2, 3 or 4!";
-		return false;
-	}
-	else
-	{
-		this->_sourceChannel = m_channel;
-		writeCmd(QString(":WAVEFORM:SOURCE CHANNEL"), this->_sourceChannel);
-		return true;
-	}
-}
-
 bool Scope::setAcquireType(ACQUIRE_TYPE m_type)
 {
 	this->_acquireType = m_type;
@@ -267,9 +258,9 @@ void Scope::autoAdjustSampleRate(double newTimebaseRange)
 		zoomOut(false);
 }
 
-void Scope::autoAdjustChannelRange(double oldChannelRange, double newChannelRange)
+void Scope::setChannelRange(double m_channelRange)
 {
-	writeCmd(":CHANNEL1:RANGE " + QString::number(newChannelRange));
+	writeCmd(":CHANNEL1:RANGE " + QString::number(m_channelRange));
 }
 
 QMap<QString, double> Scope::getWaveformPreamble()
@@ -306,6 +297,12 @@ void Scope::singleWaveformUpdate()
 
 bool Scope::digitize()
 {
-	writeCmd(QString(":DIGITIZE CHANNEL"), this->_sourceChannel);
+	QString digitizeCmd = ":DIGITIZE ";
+	for(Channel channel : channels)
+	{
+		if(channel.active)
+			digitizeCmd.append(QString("CHANNEL") + QString::number(channel.index) + ",");
+	}
+	writeCmd(digitizeCmd);
 	return true;
 }

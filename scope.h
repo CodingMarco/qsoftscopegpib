@@ -14,11 +14,10 @@ class Scope : public GpibInstrument
 
 private:
 	// Scope properties
-	int _sourceChannel = 1;
 	int _bytesPerPoint = -1;
 	int _sampleRateIndex = -1;
 	bool _waveformUpdateActive = false;
-	QVector<double> _channelsRange;
+	Channel channels[4];
 	POINTS _points = POINTS(-1);
 	WAVEFORM_FORMAT _format;
 	ACQUIRE_TYPE _acquireType;
@@ -48,7 +47,6 @@ public:
 	POINTS points() { return this->_points; }
 	QString idn() { return query("*IDN?"); }
 
-	double channelRange(int channel) { return _channelsRange[channel]; }
 	TIMEBASE_REFERENCE timebaseReference() { return _timebaseReference; }
 	bool waveformUpdateActive() { return _waveformUpdateActive; }
 
@@ -57,7 +55,6 @@ public slots:
 	bool setPoints(QString newPoints);
 	bool setPoints(POINTS newPoints);
 	bool setFormat(WAVEFORM_FORMAT m_format);
-	bool setSourceChannel(int m_channel);
 	bool setAcquireType(ACQUIRE_TYPE m_type);
 	void setTimebaseReference(TIMEBASE_REFERENCE m_reference);
 	void zoomIn(bool emitSignal = true);
@@ -78,7 +75,7 @@ public slots:
 	void initializeThreadRelatedStuff();
 	void toggleAcCouplingAndLfReject(bool toggle);
 	void autoAdjustSampleRate(double newTimebaseRange);
-	void autoAdjustChannelRange(double oldChannelRange, double newChannelRange);
+	void setChannelRange(double m_channelRange);
 
 private slots:
 	void digitizeAndGetPoints();
