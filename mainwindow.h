@@ -6,6 +6,8 @@
 #include <qwt/qwt_plot_marker.h>
 #include <QCloseEvent>
 #include <QThread>
+#include <QElapsedTimer>
+
 #include "scope.h"
 
 QT_BEGIN_NAMESPACE
@@ -24,9 +26,10 @@ private:
 	Ui::MainWindow *ui;
 	Scope scope;
 	QThread scopeThread;
-	QwtPlotCurve *waveformCurve = nullptr;
+	QVector<QwtPlotCurve*> waveformCurves;
 	QwtPlotPanner *panner = nullptr;
 	QwtPlotMarker *marker = nullptr;
+	QElapsedTimer fpsTimer;
 	double timebaseRange = 0;
 	double channelRange = 0;
 	double channelOffset = 0;
@@ -48,4 +51,5 @@ private slots:
 	void updateChannelRange();
 	void on_checkBoxACLF_stateChanged();
 	void adjustXYAfterAutoscale(XYSettings autoscaleResult);
+	void on_cmdStart_clicked();
 };

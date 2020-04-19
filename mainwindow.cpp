@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
 	// Buttons and other controls
 	connect(ui->cmdStart, &QPushButton::clicked, &scope, &Scope::startWaveformUpdate);
 	connect(ui->cmdStop, &QPushButton::clicked, &scope, &Scope::stopWaveformUpdate);
+
 	connect(ui->cmdAutoscale, &QPushButton::clicked, &scope, &Scope::autoscale);
 	connect(ui->cmdZoomIn, SIGNAL(clicked()), &scope, SLOT(zoomIn()));
 	connect(ui->cmdZoomOut, SIGNAL(clicked()), &scope, SLOT(zoomOut()));
@@ -45,10 +46,19 @@ MainWindow::MainWindow(QWidget *parent)
 
 	scopeThread.start();
 
-	waveformCurve = new QwtPlotCurve("Waveform");
-	waveformCurve->setStyle(QwtPlotCurve::Lines);
-	waveformCurve->setPen(QColor::fromRgb(255,100,255), 1);
-	waveformCurve->attach(ui->qwtPlot);
+	// Initialize waveform curves
+	for(int i = 0; i < 4; i++)
+	{
+		waveformCurves.append(new QwtPlotCurve);
+		waveformCurves.last()->setStyle(QwtPlotCurve::Lines);
+		waveformCurves.last()->attach(ui->qwtPlot);
+	}
+
+	waveformCurves[0]->setPen(QColor::fromRgb(255,255,000), 1);
+	waveformCurves[1]->setPen(QColor::fromRgb(000,255,000), 1);
+	waveformCurves[2]->setPen(QColor::fromRgb(100,100,255), 1);
+	waveformCurves[3]->setPen(QColor::fromRgb(255,100,100), 1);
+
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
 
@@ -99,7 +109,19 @@ bool MainWindow::autoconnect()
 
 void MainWindow::plotWaveforms(MultiChannelWaveformData waveformData)
 {
-	waveformCurve->setSamples(waveformData[0]);
+	static int fpsCounter = 0;
+	fpsCounter++;
+	if(fpsTimer.elapsed() > 1000)
+	{
+		ui->lblFpsNumber->setNum(fpsCounter);
+		fpsCounter = 0;
+		fpsTimer.restart();
+	}
+
+	for(int i = 0; i < waveformData.size(); i++)
+	{
+		waveformCurves[i]->setSamples(waveformData[i]);
+	}
 	ui->qwtPlot->replot();
 }
 
@@ -189,14 +211,11 @@ void MainWindow::zoomTimebase(int amount)
 
 void MainWindow::zoomVertical(int amount)
 {
-	double oldChannelRange = channelRange;
 	double absAmount = abs(amount);
 	if(amount < 0)
 		channelRange *= absAmount * 1.1;
 	else
 		channelRange *= absAmount * 0.9;
-	QMetaObject::invokeMethod(&scope, "autoAdjustChannelRange",
-							  Q_ARG(double, oldChannelRange), Q_ARG(double, channelRange));
 	updateChannelRange();
 }
 
@@ -226,4 +245,9 @@ void MainWindow::adjustXYAfterAutoscale(XYSettings autoscaleResult)
 	channelRange = autoscaleResult.channelRange;
 	channelOffset = autoscaleResult.channelOffset;
 	updateChannelRange();
+}
+
+void MainWindow::on_cmdStart_clicked()
+{
+	fpsTimer.restart();
 }

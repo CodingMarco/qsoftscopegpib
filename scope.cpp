@@ -9,6 +9,7 @@
 #include <QtEndian>
 #include <QMessageBox>
 #include <QtMath>
+#include <unistd.h>
 
 Scope::Scope()
 {
@@ -20,7 +21,7 @@ Scope::Scope()
 	channels[1].active = true;
 
 	channels[2].index = 3;
-	channels[2].active = false;
+	channels[2].active = true;
 
 	channels[3].index = 4;
 	channels[3].active = false;
@@ -91,13 +92,16 @@ bool Scope::setSampleRateByIndex(int m_sampleRateIndex)
 void Scope::digitizeAndGetPoints()
 {
 	digitizeActiveChannels();
+
 	MultiChannelWaveformData multiChannelWaveformData;
 	multiChannelWaveformData.resize(channels.size());
 
 	for(int i = 0; i < channels.size(); i++)
 	{
 		if(channels[i].active)
+		{
 			multiChannelWaveformData[i] = getPointsFromChannel(channels[i].index);
+		}
 	}
 
 	emit(waveformUpdated(multiChannelWaveformData));
@@ -298,7 +302,7 @@ WaveformPointsVector Scope::getPointsFromChannel(int channel)
 {
 	writeCmd(":WAVEFORM:SOURCE CHANNEL" + QString::number(channel));
 
-	auto preamble = getWaveformPreamble();
+	QMap<QString, double> preamble = getWaveformPreamble();
 	writeCmd(":WAVEFORM:DATA?");
 
 	QVector<ushort> yRawData = readAllWordData();
