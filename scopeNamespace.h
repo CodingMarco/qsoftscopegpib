@@ -59,7 +59,7 @@ struct XYSettings
 struct Channel
 {
 	int index = 0;
-	bool active = false;
+	bool enabled = false;
 	COUPLING coupling = DC;
 	double offset = 0;
 	double range = 0;

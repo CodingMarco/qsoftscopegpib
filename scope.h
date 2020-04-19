@@ -77,6 +77,9 @@ public slots:
 	void autoAdjustSampleRate(double newTimebaseRange);
 	void setChannelRange(double m_channelRange);
 
+	// Channels
+	void setChannelEnabled(int channel, bool enable);
+
 private slots:
 	void digitizeAndGetPoints();
 

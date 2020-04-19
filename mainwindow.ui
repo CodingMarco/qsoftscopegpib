@@ -224,6 +224,20 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lblFps">
+            <property name="text">
+             <string>FPS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="lblFpsNumber">
+            <property name="text">
+             <string>NULL</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
         <widget class="QPushButton" name="cmdZoomIn">
@@ -253,24 +267,92 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tabVertical">
+       <widget class="QWidget" name="tabChannels">
         <attribute name="title">
          <string>Channels</string>
         </attribute>
-        <widget class="QCheckBox" name="checkBoxACLF">
-         <property name="geometry">
-          <rect>
-           <x>310</x>
-           <y>60</y>
-           <width>111</width>
-           <height>51</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>AC Coupling
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QGroupBox" name="groupBoxCh1">
+           <property name="title">
+            <string>Channel 1</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="chkEnabledCh1">
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBoxACLF">
+              <property name="text">
+               <string>AC Coupling
 + LF-Reject</string>
-         </property>
-        </widget>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxCh2">
+           <property name="title">
+            <string>Channel 2</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="chkEnabledCh2">
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxCh3">
+           <property name="title">
+            <string>Channel 3</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout_4">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="chkEnabledCh3">
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBoxCh4">
+           <property name="title">
+            <string>Channel 4</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout_5">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="chkEnabledCh4">
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Debug</string>
+        </attribute>
        </widget>
       </widget>
      </widget>

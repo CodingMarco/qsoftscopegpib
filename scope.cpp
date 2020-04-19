@@ -15,16 +15,16 @@ Scope::Scope()
 {
 	channels.resize(4);
 	channels[0].index = 1;
-	channels[0].active = true;
+	channels[0].enabled = true;
 
 	channels[1].index = 2;
-	channels[1].active = true;
+	channels[1].enabled = true;
 
 	channels[2].index = 3;
-	channels[2].active = true;
+	channels[2].enabled = true;
 
 	channels[3].index = 4;
-	channels[3].active = false;
+	channels[3].enabled = false;
 }
 
 double Scope::nextLowerTimebaseRange()
@@ -98,7 +98,7 @@ void Scope::digitizeAndGetPoints()
 
 	for(int i = 0; i < channels.size(); i++)
 	{
-		if(channels[i].active)
+		if(channels[i].enabled)
 		{
 			multiChannelWaveformData[i] = getPointsFromChannel(channels[i].index);
 		}
@@ -254,6 +254,11 @@ void Scope::setChannelRange(double m_channelRange)
 	writeCmd(":CHANNEL1:RANGE " + QString::number(m_channelRange));
 }
 
+void Scope::setChannelEnabled(int channel, bool enable)
+{
+	channels[channel-1].enabled = enable;
+}
+
 QMap<QString, double> Scope::getWaveformPreamble()
 {
 	QMap<QString, double> preamble;
@@ -291,7 +296,7 @@ bool Scope::digitizeActiveChannels()
 	QString digitizeCmd = ":DIGITIZE ";
 	for(Channel channel : channels)
 	{
-		if(channel.active)
+		if(channel.enabled)
 			digitizeCmd.append(QString("CHANNEL") + QString::number(channel.index) + ",");
 	}
 	writeCmd(digitizeCmd);

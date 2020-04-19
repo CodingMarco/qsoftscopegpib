@@ -52,4 +52,8 @@ private slots:
 	void on_checkBoxACLF_stateChanged();
 	void adjustXYAfterAutoscale(XYSettings autoscaleResult);
 	void on_cmdStart_clicked();
+	void on_chkEnabledCh1_stateChanged(int checkState);
+	void on_chkEnabledCh2_stateChanged(int checkState);
+	void on_chkEnabledCh3_stateChanged(int checkState);
+	void on_chkEnabledCh4_stateChanged(int checkState);
 };

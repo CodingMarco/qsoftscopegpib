@@ -251,3 +251,23 @@ void MainWindow::on_cmdStart_clicked()
 {
 	fpsTimer.restart();
 }
+
+void MainWindow::on_chkEnabledCh1_stateChanged(int checkState)
+{
+	QMetaObject::invokeMethod(&scope, "setChannelEnabled", Q_ARG(int, 1), Q_ARG(bool, checkState == Qt::Checked));
+}
+
+void MainWindow::on_chkEnabledCh2_stateChanged(int checkState)
+{
+	QMetaObject::invokeMethod(&scope, "setChannelEnabled", Q_ARG(int, 2), Q_ARG(bool, checkState == Qt::Checked));
+}
+
+void MainWindow::on_chkEnabledCh3_stateChanged(int checkState)
+{
+	QMetaObject::invokeMethod(&scope, "setChannelEnabled", Q_ARG(int, 3), Q_ARG(bool, checkState == Qt::Checked));
+}
+
+void MainWindow::on_chkEnabledCh4_stateChanged(int checkState)
+{
+	QMetaObject::invokeMethod(&scope, "setChannelEnabled", Q_ARG(int, 4), Q_ARG(bool, checkState == Qt::Checked));
+}
