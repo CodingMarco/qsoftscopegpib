@@ -65,6 +65,11 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurves[2]->setPen(QColor::fromRgb(100,100,255), 1);
 	waveformCurves[3]->setPen(QColor::fromRgb(255,100,100), 1);
 
+	ui->groupBoxCh1->setStyleSheet("QGroupBox::title { color: rgb(255,255,000); }");
+	ui->groupBoxCh2->setStyleSheet("QGroupBox::title { color: rgb(000,255,000); }");
+	ui->groupBoxCh3->setStyleSheet("QGroupBox::title { color: rgb(100,100,255); }");
+	ui->groupBoxCh4->setStyleSheet("QGroupBox::title { color: rgb(255,100,100); }");
+
 	connect(ui->chkShowCh1, SIGNAL(clicked(bool)), waveformCurves[1-1], SLOT(setVisible(bool)));
 	connect(ui->chkShowCh2, SIGNAL(clicked(bool)), waveformCurves[2-1], SLOT(setVisible(bool)));
 	connect(ui->chkShowCh3, SIGNAL(clicked(bool)), waveformCurves[3-1], SLOT(setVisible(bool)));

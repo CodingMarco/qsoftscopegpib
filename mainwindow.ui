@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>GPIB-SoftScope</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(0,0,0);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -65,8 +68,14 @@
     </item>
     <item>
      <widget class="QSplitter" name="splitter">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
+      </property>
+      <property name="handleWidth">
+       <number>16</number>
       </property>
       <property name="childrenCollapsible">
        <bool>false</bool>
@@ -85,8 +94,30 @@
          <height>200</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QTabBar::tab {
+	padding: 8px;
+}
+
+QTabBar::tab:selected {
+	border-bottom: none;
+	border-left: 1px solid rgb(60,60,60);
+	border-right: 1px solid rgb(60,60,60);
+	border-top: 1px solid rgb(60,60,60);
+}
+
+QTabBar::tab:!selected {
+    border-bottom: 1px solid rgb(60,60,60);
+}</string>
+       </property>
+       <property name="tabShape">
+        <enum>QTabWidget::Rounded</enum>
+       </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
+       </property>
+       <property name="tabsClosable">
+        <bool>false</bool>
        </property>
        <widget class="QWidget" name="tabGeneral">
         <attribute name="title">
