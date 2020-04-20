@@ -9,6 +9,7 @@
 #include <QElapsedTimer>
 
 #include "scope.h"
+#include "customQwtPlotCurve.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,8 +27,8 @@ private:
 	Ui::MainWindow *ui;
 	Scope scope;
 	QThread scopeThread;
-	QVector<QwtPlotCurve*> waveformCurves;
-	QVector<QwtPlotCurve*> functionCurves;
+	QVector<CustomQwtPlotCurve*> waveformCurves;
+	QVector<CustomQwtPlotCurve*> functionCurves;
 	QwtPlotPanner *panner = nullptr;
 	QwtPlotMarker *marker = nullptr;
 	QElapsedTimer fpsTimer;

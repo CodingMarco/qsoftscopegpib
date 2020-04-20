@@ -86,7 +86,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tabGeneral">
         <attribute name="title">
@@ -278,6 +278,14 @@
             <string>Channel 1</string>
            </property>
            <layout class="QFormLayout" name="formLayout_2">
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="checkBoxACLF">
+              <property name="text">
+               <string>AC Coupling
++ LF-Reject</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QCheckBox" name="chkEnabledCh1">
               <property name="text">
@@ -289,10 +297,12 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QCheckBox" name="checkBoxACLF">
+             <widget class="QCheckBox" name="chkShowCh1">
               <property name="text">
-               <string>AC Coupling
-+ LF-Reject</string>
+               <string>Show</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -312,6 +322,16 @@
               </property>
              </widget>
             </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="chkShowCh2">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Show</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
@@ -328,6 +348,16 @@
               </property>
              </widget>
             </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="chkShowCh3">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Show</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
@@ -341,6 +371,16 @@
              <widget class="QCheckBox" name="chkEnabledCh4">
               <property name="text">
                <string>Enabled</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="chkShowCh4">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Show</string>
               </property>
              </widget>
             </item>
@@ -590,5 +630,134 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>chkEnabledCh1</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh1</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>64</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>70</x>
+     <y>378</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkEnabledCh2</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh2</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>307</x>
+     <y>324</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>289</x>
+     <y>445</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkEnabledCh3</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh3</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>524</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>450</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkEnabledCh4</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh4</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>768</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>754</x>
+     <y>445</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkEnabledCh4</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh4</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>779</x>
+     <y>320</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>772</x>
+     <y>445</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkEnabledCh3</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh3</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>547</x>
+     <y>323</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>546</x>
+     <y>446</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkEnabledCh2</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>317</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>444</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkEnabledCh1</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>chkShowCh1</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>95</x>
+     <y>287</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>76</x>
+     <y>365</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

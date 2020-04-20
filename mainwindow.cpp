@@ -4,6 +4,7 @@
 #include "connectdialog.h"
 #include "customAxisScaleDraw.h"
 #include "commonFunctions.h"
+#include "customQwtPlotCurve.h"
 
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_plot_curve.h>
@@ -47,14 +48,14 @@ MainWindow::MainWindow(QWidget *parent)
 	scopeThread.start();
 
 	// Initialize waveform curves
-	functionCurves.append(new QwtPlotCurve);
+	functionCurves.append(new CustomQwtPlotCurve);
 	functionCurves.last()->setStyle(QwtPlotCurve::Lines);
 	functionCurves.last()->setPen(QColor::fromRgb(255,20,147), 1);
 	functionCurves.last()->attach(ui->qwtPlot);
 
 	for(int i = 0; i < 4; i++)
 	{
-		waveformCurves.append(new QwtPlotCurve);
+		waveformCurves.append(new CustomQwtPlotCurve);
 		waveformCurves.last()->setStyle(QwtPlotCurve::Lines);
 		waveformCurves.last()->attach(ui->qwtPlot);
 	}
@@ -64,6 +65,12 @@ MainWindow::MainWindow(QWidget *parent)
 	waveformCurves[2]->setPen(QColor::fromRgb(100,100,255), 1);
 	waveformCurves[3]->setPen(QColor::fromRgb(255,100,100), 1);
 
+	connect(ui->chkShowCh1, SIGNAL(clicked(bool)), waveformCurves[1-1], SLOT(setVisible(bool)));
+	connect(ui->chkShowCh2, SIGNAL(clicked(bool)), waveformCurves[2-1], SLOT(setVisible(bool)));
+	connect(ui->chkShowCh3, SIGNAL(clicked(bool)), waveformCurves[3-1], SLOT(setVisible(bool)));
+	connect(ui->chkShowCh4, SIGNAL(clicked(bool)), waveformCurves[4-1], SLOT(setVisible(bool)));
+
+	// Initialize custom axis labels
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::xBottom, new TimebaseScaleDraw);
 	ui->qwtPlot->setAxisScaleDraw(QwtPlot::yLeft, new VoltageScaleDraw);
 

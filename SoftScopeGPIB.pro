@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     commonFunctions.cpp \
     connectdialog.cpp \
+    customQwtPlotCurve.cpp \
     gpibInstrument.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -28,6 +29,7 @@ HEADERS += \
     commonFunctions.h \
     connectdialog.h \
     customAxisScaleDraw.h \
+    customQwtPlotCurve.h \
     gpibInstrument.h \
     mainwindow.h \
     scope.h \
