@@ -274,7 +274,7 @@ void Scope::setTriggerSourceChannel(int channel)
 	writeCmd(":TRIGGER:SOURCE CHANNEL" + QString::number(channel));
 }
 
-void Scope::enableTriggerNoiseReject(double enable)
+void Scope::enableTriggerNoiseReject(bool enable)
 {
 	if(enable)
 		writeCmd(":TRIGGER:NREJECT ON");

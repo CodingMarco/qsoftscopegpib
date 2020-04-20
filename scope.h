@@ -84,7 +84,7 @@ public slots:
 	void setTriggerLevel(double level);
 	void setTriggerHoldoff(double holdoff);
 	void setTriggerSourceChannel(int channel);
-	void enableTriggerNoiseReject(double enable);
+	void enableTriggerNoiseReject(bool enable);
 
 private slots:
 	void digitizeAndGetPoints();
