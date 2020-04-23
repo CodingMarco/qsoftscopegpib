@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>GPIB-SoftScope</string>
+   <string>QSoftScopeGPIB</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(0,0,0);</string>
@@ -600,6 +600,11 @@ QTabBar::tab:!selected {
           </item>
          </layout>
         </widget>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Math</string>
+        </attribute>
        </widget>
       </widget>
      </widget>
