@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>953</width>
-    <height>582</height>
+    <width>1015</width>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -114,7 +114,7 @@ QTabBar::tab:!selected {
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="tabsClosable">
         <bool>false</bool>
@@ -143,160 +143,197 @@ QTabBar::tab:!selected {
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tabHorizontal">
+       <widget class="QWidget" name="tabTimebase">
         <attribute name="title">
          <string>Timebase</string>
         </attribute>
-        <widget class="QWidget" name="formLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>341</width>
-           <height>121</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="lblPoints">
-            <property name="text">
-             <string>Points</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBoxPoints">
-            <property name="currentIndex">
-             <number>1</number>
-            </property>
-            <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblPoints">
              <property name="text">
-              <string>512</string>
+              <string>Points</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="comboBoxPoints">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>512</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1024</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>2048</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>4096</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>8192</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>16384</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>32768</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="lblReference">
              <property name="text">
-              <string>1024</string>
+              <string>Reference</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="comboBoxReference">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <property name="maxVisibleItems">
+              <number>3</number>
+             </property>
+             <property name="maxCount">
+              <number>3</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>Left</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Center</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Right</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="lblTimebaseRange">
              <property name="text">
-              <string>2048</string>
+              <string>Timebase range</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="lblTimebaseRangeNumber">
              <property name="text">
-              <string>4096</string>
+              <string>NULL</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="lblSampleRate">
              <property name="text">
-              <string>8192</string>
+              <string>Sample rate</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="lblSampleRateNumber">
              <property name="text">
-              <string>16384</string>
+              <string>NULL</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="lblFps">
              <property name="text">
-              <string>32768</string>
+              <string>FPS</string>
              </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lblReference">
-            <property name="text">
-             <string>Reference</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="comboBoxReference">
-            <property name="currentIndex">
-             <number>1</number>
-            </property>
-            <property name="maxVisibleItems">
-             <number>3</number>
-            </property>
-            <property name="maxCount">
-             <number>3</number>
-            </property>
-            <item>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLabel" name="lblFpsNumber">
              <property name="text">
-              <string>Left</string>
+              <string>NULL</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QPushButton" name="cmdZoomIn">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>40</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Center</string>
+              <string>Zoom in</string>
              </property>
-            </item>
-            <item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="cmdZoomOut">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>40</height>
+              </size>
+             </property>
              <property name="text">
-              <string>Right</string>
+              <string>Zoom out</string>
              </property>
-            </item>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lblTimebaseRange">
-            <property name="text">
-             <string>Timebase range</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="lblTimebaseRangeNumber">
-            <property name="text">
-             <string>NULL</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="lblFps">
-            <property name="text">
-             <string>FPS</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="lblFpsNumber">
-            <property name="text">
-             <string>NULL</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QPushButton" name="cmdZoomIn">
-         <property name="geometry">
-          <rect>
-           <x>400</x>
-           <y>30</y>
-           <width>80</width>
-           <height>25</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Zoom in</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="cmdZoomOut">
-         <property name="geometry">
-          <rect>
-           <x>520</x>
-           <y>30</y>
-           <width>80</width>
-           <height>25</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Zoom out</string>
-         </property>
-        </widget>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabChannels">
         <attribute name="title">
@@ -420,7 +457,7 @@ QTabBar::tab:!selected {
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="tabTrigger">
         <attribute name="title">
          <string>Trigger</string>
         </attribute>
@@ -601,10 +638,95 @@ QTabBar::tab:!selected {
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="tabMath">
         <attribute name="title">
          <string>Math</string>
         </attribute>
+       </widget>
+       <widget class="QWidget" name="tabMeasurements">
+        <attribute name="title">
+         <string>Measurements</string>
+        </attribute>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>30</y>
+           <width>151</width>
+           <height>101</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout_6">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblFreq">
+            <property name="text">
+             <string>Frequency</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="lblFreqNumber">
+            <property name="text">
+             <string>NULL</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lblPeriod">
+            <property name="text">
+             <string>Period</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="lblPeriodNumber">
+            <property name="text">
+             <string>NULL</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QTableWidget" name="tableMeasurements">
+         <property name="geometry">
+          <rect>
+           <x>340</x>
+           <y>30</y>
+           <width>461</width>
+           <height>161</height>
+          </rect>
+         </property>
+         <attribute name="horizontalHeaderCascadingSectionResizes">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderHighlightSections">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Channel</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Measurement</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Value</string>
+          </property>
+         </column>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -616,7 +738,7 @@ QTabBar::tab:!selected {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>953</width>
+     <width>1015</width>
      <height>22</height>
     </rect>
    </property>

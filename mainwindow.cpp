@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(&scopeThread, SIGNAL(started()), &scope, SLOT(initializeThreadRelatedStuff()));
 
 	// Waveform plot
-	connect(&scope, SIGNAL(waveformUpdated(MultiChannelWaveformData)), this, SLOT(plotWaveforms(MultiChannelWaveformData)));
+	connect(&scope, SIGNAL(waveformUpdated(MultiChannelWaveformData, ScopeSettings)), this, SLOT(plotWaveforms(MultiChannelWaveformData, ScopeSettings)));
 	connect(ui->qwtPlot, &WaveformPlot::mouseScrolled, this, &MainWindow::zoomTimebase);
 	connect(ui->qwtPlot, &WaveformPlot::mouseWithShiftScrolled, this, &MainWindow::zoomVertical);
 
@@ -124,8 +124,16 @@ bool MainWindow::autoconnect()
 	return true;
 }
 
-void MainWindow::plotWaveforms(MultiChannelWaveformData waveformData)
+void MainWindow::plotWaveforms(MultiChannelWaveformData waveformData, ScopeSettings scopeSettings)
 {
+	double frequency = measurements.getFrequency(waveformData[0], scopeSettings.sampleRate);
+	double period = double(1)/frequency;
+
+	ui->lblFreqNumber->setText(CommonFunctions::toSiValue(frequency, "Hz"));
+	ui->lblPeriodNumber->setText(CommonFunctions::toSiValue(period, "s"));
+
+	ui->lblSampleRateNumber->setText(CommonFunctions::toSiValue(scopeSettings.sampleRate, "Sa/s"));
+
 	static int fpsCounter = 0;
 	fpsCounter++;
 	if(fpsTimer.elapsed() > 1000)
@@ -141,10 +149,10 @@ void MainWindow::plotWaveforms(MultiChannelWaveformData waveformData)
 	}
 
 	// Function: 1-2
-	if(ui->chkEnabledCh1->isChecked() && ui->chkEnabledCh2->isChecked())
-	{
-		functionCurves[0]->setSamples(CommonFunctions::getFunctionWaveform(waveformData[1-1], waveformData[2-1], MINUS));
-	}
+//	if(ui->chkEnabledCh1->isChecked() && ui->chkEnabledCh2->isChecked())
+//	{
+//		functionCurves[0]->setSamples(CommonFunctions::getFunctionWaveform(waveformData[1-1], waveformData[2-1], MINUS));
+//	}
 
 	ui->qwtPlot->replot();
 }

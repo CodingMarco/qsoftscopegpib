@@ -92,7 +92,7 @@ private slots:
 	void digitizeAndGetPoints();
 
 signals:
-	void waveformUpdated(MultiChannelWaveformData);
+	void waveformUpdated(MultiChannelWaveformData, ScopeSettings);
 	void autoscaleComplete(XYSettings autoscaleResult);
 	void zoomed(double newOptimalTimebaseRange);
 };

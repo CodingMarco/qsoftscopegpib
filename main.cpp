@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 	qRegisterMetaType<MultiChannelWaveformData>("MultiChannelWaveformData");
 	qRegisterMetaType<TIMEBASE_REFERENCE>("TIMEBASE_REFERENCE");
 	qRegisterMetaType<XYSettings>("XYSettings");
+	qRegisterMetaType<ScopeSettings>("ScopeSettings");
 	MainWindow w;
 	w.show();
 	return a.exec();

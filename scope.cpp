@@ -101,7 +101,7 @@ void Scope::digitizeAndGetPoints()
 		}
 	}
 
-	emit(waveformUpdated(multiChannelWaveformData));
+	emit(waveformUpdated(multiChannelWaveformData, { validSampleRates[_sampleRateIndex] }));
 }
 
 bool Scope::setPoints(QString newPoints)
@@ -303,6 +303,7 @@ void Scope::autoscale()
 	autoscaleResult.channelOffset = getChannelOffset();
 	autoscaleResult.timebaseRange = optimalTimebaseRange();
 	autoscaleResult.timebaseDelay = 0;
+	writeCmd(":TIMEBASE:RANGE 1");
 	emit autoscaleComplete(autoscaleResult);
 }
 

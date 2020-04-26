@@ -48,10 +48,7 @@ enum FUNCTION_OPERATOR
 
 struct ScopeSettings
 {
-	POINTS points;
-	WAVEFORM_FORMAT waveformFormat;
-	ACQUIRE_TYPE acquireType;
-	TIMEBASE_REFERENCE timebaseReference;
+	int sampleRate;
 };
 
 struct XYSettings

@@ -22,8 +22,10 @@ SOURCES += \
     gpibInstrument.cpp \
     main.cpp \
     mainwindow.cpp \
+    measurements.cpp \
     scope.cpp \
-    waveformPlot.cpp
+    waveformPlot.cpp \
+    yin.cpp
 
 HEADERS += \
     commonFunctions.h \
@@ -32,9 +34,11 @@ HEADERS += \
     customQwtPlotCurve.h \
     gpibInstrument.h \
     mainwindow.h \
+    measurements.h \
     scope.h \
     scopeNamespace.h \
-    waveformPlot.h
+    waveformPlot.h \
+    yin.h
 
 FORMS += \
     connectdialog.ui \

@@ -10,6 +10,7 @@
 
 #include "scope.h"
 #include "customQwtPlotCurve.h"
+#include "measurements.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,6 +30,7 @@ private:
 	QThread scopeThread;
 	QVector<CustomQwtPlotCurve*> waveformCurves;
 	QVector<CustomQwtPlotCurve*> functionCurves;
+	Measurements measurements;
 	QwtPlotPanner *panner = nullptr;
 	QwtPlotMarker *marker = nullptr;
 	QElapsedTimer fpsTimer;
@@ -40,7 +42,7 @@ private:
 	bool autoconnect();
 
 private slots:
-	void plotWaveforms(MultiChannelWaveformData waveformData);
+	void plotWaveforms(MultiChannelWaveformData waveformData, ScopeSettings scopeSettings);
 	void on_actionConnect_triggered();
 	void on_actionInfo_triggered();
 	void on_cmdQuery_clicked();
