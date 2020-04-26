@@ -4,22 +4,37 @@
 
 QString CommonFunctions::toSiValue(double value, QString unit)
 {
-	double absSeconds = value < 0 ? -value : value;
+	double absValue = value < 0 ? -value : value;
 
-	if(absSeconds >= 1 || absSeconds == 0)
+	if((absValue >= 1 && absValue < 1e3) || absValue == 0)
+	{
 		return QString::number(value) + " " + unit;
+	}
+	else if(absValue >= 1e3)
+	{
+		if(absValue < 1e6)
+			return QString::number(value * 1e-3) + " k" + unit;
 
-	else if(absSeconds < 1 && absSeconds >= 1e-3)
-		return QString::number(value * 1e3) + " m" + unit;
+		else if(absValue >= 1e6 && absValue < 1e9)
+			return QString::number(value * 1e-6) + " M" + unit;
 
-	else if(absSeconds < 1e-3 && absSeconds >= 9999e-10)
-		return QString::number(value * 1e6) + " u" + unit;
-
-	else if(absSeconds < 1e-6 && absSeconds >= 9999e-13)
-		return QString::number(value * 1e9) + " n" + unit;
-
+		else
+			return QString::number(value * 1e-9) + " G" + unit;
+	}
 	else
-		return QString::number(value * 1e12) + " p" + unit;
+	{
+		if(absValue >= 1e-3)
+			return QString::number(value * 1e3) + " m" + unit;
+
+		else if(absValue < 1e-3 && absValue >= 9999e-10)
+			return QString::number(value * 1e6) + " u" + unit;
+
+		else if(absValue < 1e-6 && absValue >= 9999e-13)
+			return QString::number(value * 1e9) + " n" + unit;
+
+		else
+			return QString::number(value * 1e12) + " p" + unit;
+	}
 }
 
 WaveformPointsVector CommonFunctions::getFunctionWaveform(WaveformPointsVector &op1,
