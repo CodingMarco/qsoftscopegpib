@@ -27,6 +27,8 @@ private:
 			int(2.5e6), int(1e6), int(500e3), int(250e3), int(100e3), int(50e3), int(25e3), int(10e3), int(5e3),
 			int(2.5e3), int(1e3), int(500) };
 
+	int minimumSampleRateIndex();
+
 	// Misc
 	QTimer *waveformUpdateTimer;
 	bool _printCommands = false;

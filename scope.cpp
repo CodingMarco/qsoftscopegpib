@@ -18,10 +18,10 @@ Scope::Scope()
 	channels[0].enabled = true;
 
 	channels[1].index = 2;
-	channels[1].enabled = true;
+	channels[1].enabled = false;
 
 	channels[2].index = 3;
-	channels[2].enabled = true;
+	channels[2].enabled = false;
 
 	channels[3].index = 4;
 	channels[3].enabled = false;
@@ -29,7 +29,7 @@ Scope::Scope()
 
 double Scope::nextLowerTimebaseRange()
 {
-	if(_sampleRateIndex <= 0)
+	if(_sampleRateIndex <= minimumSampleRateIndex())
 		return optimalTimebaseRange();
 	else
 		return double(this->_points) / validSampleRates[_sampleRateIndex-1];
@@ -76,17 +76,14 @@ int Scope::updateSampleRateFromScope()
 
 bool Scope::setSampleRateByIndex(int m_sampleRateIndex)
 {
-	if(m_sampleRateIndex >= 0 && m_sampleRateIndex < validSampleRates.size())
+	if(m_sampleRateIndex >= minimumSampleRateIndex() && m_sampleRateIndex < validSampleRates.size())
 	{
 		_sampleRateIndex = m_sampleRateIndex;
 		writeCmd(QString(":TIMEBASE:SAMPLE:CLOCK ") + QString::number(validSampleRates[m_sampleRateIndex]));
 		return true;
 	}
 	else
-	{
-		qCritical() << "[CRITICAL]: setSampleRateIndex(): Index out of range!";
 		return false;
-	}
 }
 
 void Scope::digitizeAndGetPoints()
@@ -181,7 +178,7 @@ void Scope::setTimebaseReference(TIMEBASE_REFERENCE m_reference)
 void Scope::zoomIn(bool emitSignal)
 {
 	// If not, maximum zoom in is reached.
-	if(_sampleRateIndex > 0)
+	if(_sampleRateIndex > minimumSampleRateIndex())
 	{
 		setSampleRateByIndex(_sampleRateIndex-1);
 		if(emitSignal)
@@ -312,6 +309,18 @@ void Scope::autoscale()
 void Scope::singleWaveformUpdate()
 {
 	digitizeAndGetPoints();
+}
+
+int Scope::minimumSampleRateIndex()
+{
+	int activeChannels = 0;
+	for(Channel channel : channels)
+	{
+		if(channel.enabled)
+			activeChannels++;
+	}
+
+	return activeChannels == 0 ? 0 : activeChannels-1;
 }
 
 bool Scope::digitizeActiveChannels()
