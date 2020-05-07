@@ -8,5 +8,5 @@ Qt application to control my HP 54540A oscilloscope over the GPIB bus using the 
 - GPIB-USB Adapter
 
 # Compatibility
-May work with other HP **digitizing** oscilloscopes from around that time (~1994) if you adjust the maximum sample rate.
+May work with other HP **digitizing** oscilloscopes from around that time (~1994) if you adjust the maximum sample rate and the number of channels.
 Should work perfectly with the HP 54542A, 54540C, 54542C, 54520A, 54520C, 54522A, 54522C.
