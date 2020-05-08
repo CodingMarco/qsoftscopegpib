@@ -126,11 +126,11 @@ bool MainWindow::autoconnect()
 
 void MainWindow::plotWaveforms(MultiChannelWaveformData waveformData, ScopeSettings scopeSettings)
 {
-	double frequency = measurements.getFrequency(waveformData[0], scopeSettings.sampleRate);
-	double period = double(1)/frequency;
+	//double frequency = measurements.getFrequency(waveformData[0], scopeSettings.sampleRate);
+	//double period = double(1)/frequency;
 
-	ui->lblFreqNumber->setText(CommonFunctions::toSiValue(frequency, "Hz"));
-	ui->lblPeriodNumber->setText(CommonFunctions::toSiValue(period, "s"));
+	//ui->lblFreqNumber->setText(CommonFunctions::toSiValue(frequency, "Hz"));
+	//ui->lblPeriodNumber->setText(CommonFunctions::toSiValue(period, "s"));
 
 	ui->lblSampleRateNumber->setText(CommonFunctions::toSiValue(scopeSettings.sampleRate, "Sa/s"));
 

@@ -1,13 +1,26 @@
 #pragma once
 
 #include <QObject>
+#include <QVector>
 #include "scopeNamespace.h"
+
+struct MeasurementResult
+{
+	// Markers markers
+	double value;
+};
 
 class Measurements : public QObject
 {
 	Q_OBJECT
 public:
 	explicit Measurements(QObject *parent = nullptr);
-	int getFrequency(WaveformPointsVector &points, int sampleRate);
+	void setWaveform(const WaveformPointsVector &m_points);
+	MeasurementResult Frequency(int sampleRate);
+	MeasurementResult Vmin();
+	MeasurementResult Vmax();
 
+private:
+	WaveformPointsVector points;
+	QVector<double> yValues;
 };

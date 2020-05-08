@@ -19,7 +19,7 @@ private:
 	bool _waveformUpdateActive = false;
 	QVector<Channel> channels;
 	POINTS _points = POINTS(-1);
-	WAVEFORM_FORMAT _format;
+	WAVEFORM_FORMAT _format = WAVEFORM_FORMAT_WORD;
 	ACQUIRE_TYPE _acquireType;
 	TIMEBASE_REFERENCE _timebaseReference;
 	QVector<int> validSampleRates
