@@ -57,6 +57,15 @@ MainWindow::MainWindow(QWidget *parent)
 	{
 		waveformCurves.append(new CustomQwtPlotCurve);
 		waveformCurves.last()->setStyle(QwtPlotCurve::Lines);
+
+		QwtSplineCurveFitter* fitter = new QwtSplineCurveFitter();
+		fitter->setFitMode(QwtSplineCurveFitter::Spline);
+		fitter->setSplineSize(3000);
+
+		waveformCurves.last()->setCurveFitter(fitter);
+		waveformCurves.last()->setCurveAttribute(QwtPlotCurve::Fitted);
+
+
 		waveformCurves.last()->attach(ui->qwtPlot);
 	}
 
@@ -90,12 +99,6 @@ MainWindow::MainWindow(QWidget *parent)
 	panner = new QwtPlotPanner(ui->qwtPlot->canvas());
 	panner->setMouseButton(Qt::LeftButton);
 
-	// Marker
-//	marker = new QwtPlotMarker("X1");
-//	marker->setLineStyle(QwtPlotMarker::VLine);
-//	marker->setLinePen(QColor::fromRgb(100,100,255), 2);
-//	marker->attach(ui->qwtPlot);
-
 	autoconnect();
 }
 
@@ -107,6 +110,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	QMetaObject::invokeMethod(&scope, "stopWaveformUpdate", Qt::BlockingQueuedConnection);
+	scope.writeCmd(":DISP:SCREEN ON");
 	scope.closeInstrument();
 	scopeThread.quit();
 	event->accept();

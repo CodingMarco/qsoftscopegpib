@@ -21,7 +21,7 @@ void Measurements::setWaveform(const WaveformPointsVector& m_points)
 	}
 }
 
-MeasurementResult Measurements::getFrequency(int sampleRate)
+MeasurementResult Measurements::Frequency(int sampleRate)
 {
 	MeasurementResult result;
 	Yin yin(sampleRate, points.length());
@@ -31,7 +31,7 @@ MeasurementResult Measurements::getFrequency(int sampleRate)
 	return result;
 }
 
-MeasurementResult Measurements::vmin()
+MeasurementResult Measurements::Vmin()
 {
 	MeasurementResult result;
 
@@ -41,12 +41,22 @@ MeasurementResult Measurements::vmin()
 	return result;
 }
 
-MeasurementResult Measurements::vmax()
+MeasurementResult Measurements::Vmax()
 {
 	MeasurementResult result;
 
 	int minValueIndex = std::distance(yValues.constBegin(), std::max_element(yValues.constBegin(), yValues.constEnd()));
 	result.value = yValues[minValueIndex];
+
+	return result;
+}
+
+MeasurementResult Measurements::Vavg()
+{
+	MeasurementResult result;
+
+	double average = std::accumulate(yValues.constBegin(), yValues.constEnd(), 0.0) / yValues.size();
+	result.value = average;
 
 	return result;
 }

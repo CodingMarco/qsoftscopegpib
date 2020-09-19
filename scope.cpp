@@ -321,7 +321,7 @@ int Scope::minimumSampleRateIndex()
 			activeChannels++;
 	}
 
-	return activeChannels == 0 ? 0 : activeChannels-1;
+	return activeChannels == 0 || twoGigaSamplesOnAllChannels ? 0 : activeChannels-1;
 }
 
 bool Scope::digitizeActiveChannels()

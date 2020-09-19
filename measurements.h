@@ -19,6 +19,7 @@ public:
 	MeasurementResult Frequency(int sampleRate);
 	MeasurementResult Vmin();
 	MeasurementResult Vmax();
+	MeasurementResult Vavg();
 
 private:
 	WaveformPointsVector points;

@@ -13,6 +13,10 @@ class Scope : public GpibInstrument
 	Q_OBJECT
 
 private:
+	// Model properties
+	// Models 545x2x have a maximum sample rate of 2 GSa/s on all channels simultaneously.
+	// Models 545x0x are limited to 2 GSa/s with one channel on, 1 GSa/s with two channels on and 500 MSa/s with three or four channels on.
+	const bool twoGigaSamplesOnAllChannels = true;
 	// Scope properties
 	int _bytesPerPoint = -1;
 	int _sampleRateIndex = -1;
