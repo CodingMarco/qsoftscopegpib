@@ -9,7 +9,7 @@ class GpibInstrument : public QObject
 
 private:
 	volatile int ibsta;
-	volatile int iberr;
+	volatile int iberr = 0;
 	volatile int ibcnt;
 	volatile long ibcntl;
 

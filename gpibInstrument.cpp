@@ -19,18 +19,17 @@ bool GpibInstrument::openInstrument(int addr)
 {
 	// Connect to scope at specified address
 	// /dev/gpib0, addr. 7, no second addr, 10s timeout, no EOI line, stop at EOS-Byte
-	this->instr = ibdev(0, addr, 0, T10s, 0, 0);
+	this->instr = ibdev(0, 1, 0, T1s, 0, 0);
 	if(this->instr == -1)
 	{
 		qCritical() << "Could not connect to GPIB-adapter";
 		exit(EXIT_FAILURE);
 	}
 	QString idn = query("*IDN?");
-	if(iberr == EBUS)
+	if(idn.isEmpty())
 	{
-		QMessageBox::critical(nullptr, "Connection timed out!", "Connection timed out!");
-		status = iberr;
-		return false;
+		QMessageBox::critical(nullptr, QStringLiteral("Connection failed!"), QStringLiteral("Connection failed!"));
+		exit(EXIT_FAILURE);
 	}
 	else
 	{
@@ -43,6 +42,9 @@ bool GpibInstrument::closeInstrument()
 {
 	if(this->isOpen())
 	{
+		ibclr(instr);
+		ibsre(instr, 0);
+		ibsic(instr);
 		ibonl(instr, 0);
 		instr = -1;
 		return true;
@@ -60,7 +62,7 @@ bool GpibInstrument::writeCmd(QString cmd)
 	if(!cmd.endsWith('\n'))
 		cmd.append('\n');
 	status = ibwrt(instr, cmd.toStdString().c_str(), cmd.length());
-	return true;
+	return !(status & ERR);
 }
 
 bool GpibInstrument::writeCmd(QString cmd, int param)
