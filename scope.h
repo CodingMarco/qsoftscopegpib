@@ -24,8 +24,8 @@ private:
 	QVector<Channel> channels;
 	POINTS _points = POINTS(-1);
 	WAVEFORM_FORMAT _format = WAVEFORM_FORMAT_WORD;
-	ACQUIRE_TYPE _acquireType;
-	TIMEBASE_REFERENCE _timebaseReference;
+	ACQUIRE_TYPE _acquireType = ACQUIRE_TYPE_NORMAL;
+	TIMEBASE_REFERENCE _timebaseReference = CENTER;
 	QVector<int> validSampleRates
 		= { int(2.0e9), int(1e9), int(500e6), int(250e6), int(100e6), int(50e6), int(25e6), int(10e6), int(5e6),
 			int(2.5e6), int(1e6), int(500e3), int(250e3), int(100e3), int(50e3), int(25e3), int(10e3), int(5e3),
