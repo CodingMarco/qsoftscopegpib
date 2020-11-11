@@ -19,7 +19,7 @@ bool GpibInstrument::openInstrument(int addr)
 {
 	// Connect to scope at specified address
 	// /dev/gpib0, addr. 7, no second addr, 10s timeout, no EOI line, stop at EOS-Byte
-	this->instr = ibdev(0, 1, 0, T1s, 0, 0);
+	this->instr = ibdev(board_index, addr, 0, T1s, 0, 0);
 	if(this->instr == -1)
 	{
 		qCritical() << "Could not connect to GPIB-adapter";
@@ -33,6 +33,11 @@ bool GpibInstrument::openInstrument(int addr)
 	}
 	else
 	{
+		// Make the GPIB adapter the system controller to be able to set Remote Eable (REN)
+		ibrsc(board_index, true);
+
+		// Set this to false to put instrument into "remote" mode where the front panel is blocked
+		ibsre(board_index, true);
 		qDebug() << "Opened GPIB instrument with IDN: " << idn;
 		return true;
 	}
@@ -42,10 +47,16 @@ bool GpibInstrument::closeInstrument()
 {
 	if(this->isOpen())
 	{
+		// Send clear command to device
 		ibclr(instr);
-		ibsre(instr, 0);
-		ibsic(instr);
-		ibonl(instr, 0);
+		// Disable Remote Enable (REN)
+		ibsre(board_index, false);
+		// Reset GPIB board (interface clear)
+		ibsic(board_index);
+		// Set device to not online
+		ibonl(instr, false);
+		// Set board to not online
+		ibonl(board_index, false);
 		instr = -1;
 		return true;
 	}

@@ -15,6 +15,7 @@ private:
 
 	int instr = -1;
 	int status = -1;
+	int board_index = 0;
 
 	QVector<ushort> bytesToWord(QByteArray bytes);
 
