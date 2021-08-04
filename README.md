@@ -1,6 +1,8 @@
 # QSoftscopeGPIB
 Qt application to control my HP 54540A oscilloscope over the GPIB bus using the linux-gpib library. Waveforms are displayed on a QWT plot.
 
+![qsoftscopegpib](https://user-images.githubusercontent.com/26282917/128179809-73a4975a-43f7-43fa-88c0-ae81c8fdfa0f.png)
+
 # Prerequisites
 - Qt
 - linux-gpib
